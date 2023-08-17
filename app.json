@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "kubsu2",
+    "name": "Жизнь Студента КубГУ",
     "slug": "kubsu2",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,16 +15,24 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "package": "Studcom.studk.app",
+      "bundleIdentifier": "Studcom.studk.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "Studcom.studk.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "44288204-7b9b-4f20-b4c8-666db344b469"
+      }
     }
   }
 }
