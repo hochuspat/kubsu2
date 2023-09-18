@@ -79,15 +79,13 @@ const MeropriatiaScreen = () => {
       .then((data) => {
         setNews(data);
   
-        // Filter news based on selected category
         const filteredData = selectedCategory
           ? data.filter((item) => item.category === selectedCategory)
           : data;
           const updatedData = data.map((item) => {
-            const faculty = item.faculty; // Здесь получите значение факультета для каждой новости из API
+            const faculty = item.faculty; 
             return { ...item, faculty };
           });
-        // Sort filteredData based on favoriteNews and date
         const sortedData = filteredData.sort((a, b) => {
           const isAFavorite = favoriteNews.includes(a.id);
           const isBFavorite = favoriteNews.includes(b.id);
@@ -97,7 +95,6 @@ const MeropriatiaScreen = () => {
           } else if (!isAFavorite && isBFavorite) {
             return 1;
           } else {
-            // If both items are favorite or non-favorite, sort by date
             const aDate = new Date(a.date).getTime();
             const bDate = new Date(b.date).getTime();
             return aDate - bDate;
@@ -301,11 +298,13 @@ const MeropriatiaScreen = () => {
     </ScrollView>
   );
 };
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#FFFFFF', // Кубанский государственный университет: белый фон
+    backgroundColor: '#FFFFFF', 
   },
   menu: {
     marginBottom: 16,
@@ -315,36 +314,36 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     marginRight: 8,
-    backgroundColor: '#007AFF', // Кубанский государственный университет: синий цвет
+    backgroundColor: '#007AFF', 
     elevation: 2,
   },
   selectedMenuItem: {
-    backgroundColor: '#FFFFFF', // Кубанский государственный университет: белый фон
+    backgroundColor: '#FFFFFF', 
   },
   menuItemText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#FFFFFF', // Кубанский государственный университет: белый цвет
+    color: '#FFFFFF', 
   },
   selectedMenuItemText: {
-    color: '#007AFF', // Кубанский государственный университет: синий цвет
+    color: '#007AFF', 
   },
   heading: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
-    color: '#007AFF', // Кубанский государственный университет: синий цвет
+    color: '#007AFF', 
   },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
-    padding: 12, // Adjusted padding value
+    padding: 12,
     marginBottom: 16,
     elevation: 2,
     borderWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.1)', // Blurred border color
-    overflow: 'hidden', // Clip the content within the border
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    overflow: 'hidden', 
   },
   image: {
     width: '100%',
@@ -401,13 +400,13 @@ const styles = StyleSheet.create({
   favoriteButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#FFFFFF', // Кубанский государственный университет: белый цвет
+    color: '#FFFFFF', 
     textAlign: 'center',
   },
   modalContainer: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#FFFFFF', // Кубанский государственный университет: белый фон
+    backgroundColor: '#FFFFFF', 
   },
   modalContent: {
     backgroundColor: '#FFFFFF',
