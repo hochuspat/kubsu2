@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
-
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 const Arenda = () => {
-  const navigation = useNavigation();
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [priceFilter, setPriceFilter] = useState(null);
   const [typeFilter, setTypeFilter] = useState(null);
-  const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [filteredAds, setFilteredAds] = useState([]);
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [isSorjitelPressed, setIsSorjitelPressed] = useState(false);
   const [isKvartiraPressed, setIsKvartiraPressed] = useState(false);
-  const [isFilterIconPressed, setIsFilterIconPressed] = useState(false);
+  const [isFilterIconPressed, setIsFilterIconPressed] = useState(false);  
+  const navigation = useNavigation(); 
 
   const getAds = async () => {
     try {
@@ -25,76 +24,71 @@ const Arenda = () => {
       }
       const data = await response.json();
       setAds(data);
+      setFilteredAds(data); 
       setLoading(false);
     } catch (error) {
       setError('Ошибка при получении карточек: ' + error.message);
       setLoading(false);
     }
   };
+
   useEffect(() => {
-    getAds(); // Вызываем функцию при монтировании компонента
+    getAds();
   }, []);
 
-  useEffect(() => {
-    applyFilters();
-  }, [priceFilter, typeFilter]);
-
-  const applyFilters = () => {
-    let filteredAds = ads;
-
-    if (priceFilter) {
-      filteredAds = filteredAds.filter((ad) => ad.price <= priceFilter);
-    }
-
-    if (typeFilter) {
-      filteredAds = filteredAds.filter((ad) => ad.type === typeFilter);
-    }
-
-    setFilteredAds(filteredAds);
+  const handlePriceFilterChange = (value) => {
+    setPriceFilter(value);
+    applyFilters(value, typeFilter);
   };
 
-  const resetFilters = () => {
-    setPriceFilter(null);
-    setTypeFilter(null);
-    setIsSorjitelPressed(false);
-    setIsKvartiraPressed(false);
-    applyFilters();
+  const handleTypeFilterChange = (type) => {
+    setTypeFilter(type);
+    applyFilters(priceFilter, type);
   };
 
   const handleDetails = (id) => {
-    navigation.navigate('Details', { id });
+  navigation.navigate('Details', {id});
+};
+  const resetFilters = () => {
+    setPriceFilter(null);
+    setTypeFilter(null);
+    setFilteredAds(ads); 
   };
 
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
+  const applyFilters = (price, type) => {
+    let filtered = ads;
 
-  if (error) {
-    return <Text>{error}</Text>;
-  }
+    if (price !== null) {
+      filtered = filtered.filter((ad) => ad.price <= price);
+    }
+
+    if (type) {
+      filtered = filtered.filter((ad) => ad.type === type);
+    }
+
+    setFilteredAds(filtered);
+  };
 
   return (
     <View style={styles.container}>
-<TouchableOpacity
-  style={styles.filterButton}
-  onPress={() => {
-    setIsFilterVisible(!isFilterVisible);
-    setIsFilterIconPressed(!isFilterIconPressed);
-  }}
->
-<AntDesign
-  name="filter"
-  size={24}
-  color="#0099ff"
-  style={styles.filterIcon}
-  onPress={() => {
-    setIsFilterIconPressed(!isFilterIconPressed);
-    setIsFilterVisible(!isFilterVisible);
-  }}
-/>
-
-</TouchableOpacity>
-
+      <TouchableOpacity
+        style={styles.filterButton}
+        onPress={() => {
+          setIsFilterVisible(!isFilterVisible);
+          setIsFilterIconPressed(!isFilterIconPressed);
+        }}
+      >
+        <AntDesign
+          name="filter"
+          size={24}
+          color="#0099ff"
+          style={styles.filterIcon}
+          onPress={() => {
+            setIsFilterIconPressed(!isFilterIconPressed);
+            setIsFilterVisible(!isFilterVisible);
+          }}
+        />
+      </TouchableOpacity>
 
       {isFilterVisible && (
         <View>
@@ -105,7 +99,7 @@ const Arenda = () => {
             maximumValue={10000}
             step={10}
             value={priceFilter || 10000}
-            onValueChange={(value) => setPriceFilter(value)}
+            onValueChange={handlePriceFilterChange}
             minimumTrackTintColor="#0099ff"
             maximumTrackTintColor="#E0E0E0"
             thumbTintColor="#0099ff"
@@ -119,7 +113,7 @@ const Arenda = () => {
                 isSorjitelPressed ? styles.selectedFilterButton : null
               ]}
               onPress={() => {
-                setTypeFilter('сожитель');
+                handleTypeFilterChange('сожитель');
                 setIsSorjitelPressed(true);
                 setIsKvartiraPressed(false);
               }}
@@ -140,7 +134,7 @@ const Arenda = () => {
                 isKvartiraPressed ? styles.selectedFilterButton : null
               ]}
               onPress={() => {
-                setTypeFilter('квартира');
+                handleTypeFilterChange('квартира');
                 setIsKvartiraPressed(true);
                 setIsSorjitelPressed(false);
               }}
@@ -162,8 +156,7 @@ const Arenda = () => {
           </TouchableOpacity>
         </View>
       )}
-
-      <ScrollView>
+      <ScrollView >
         {filteredAds.map((ad) => (
           <View key={ad.id} style={styles.ad}>
             <Image source={{ uri: ad.img }} style={styles.image} />
@@ -190,6 +183,7 @@ const Arenda = () => {
     </View>
   );
 };
+
 
 const styles = {
   container: {
@@ -317,7 +311,7 @@ const styles = {
   },
   filterIcon: {
     marginLeft: 5,
-    alignSelf: 'center', // Центрируйте иконку вертикально
+    alignSelf: 'center', 
   },
   
 };

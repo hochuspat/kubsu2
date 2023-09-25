@@ -7,10 +7,14 @@ import {
   Image,
   TouchableOpacity,
   RefreshControl,
-  Linking,Button, ToastAndroid
+  Linking,
+  Button,
+  ToastAndroid,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import * as Clipboard from 'expo-clipboard'
+import { Card, Title, Paragraph } from 'react-native-paper';
+import * as Clipboard from 'expo-clipboard';
+
 const CategoryFilter = ({ selectedCategory, onCategorySelect }) => {
   const categories = [
     { id: null, name: 'Все' },
@@ -142,7 +146,10 @@ const MeropriatiaScreen = () => {
   const handleNewsPress = (item) => {
     setSelectedNews(item);
     setModalVisible(true);
+    console.log('Item Faculty:', item.faculty); // Log faculty value
+    console.log('URL:', facultyLinks[item.faculty]); // Log the URL
   };
+  
 
   const toggleNewsExpansion = (itemId) => {
     if (isNewsExpanded(itemId)) {
@@ -201,19 +208,14 @@ const MeropriatiaScreen = () => {
 
       {filteredNews.map((item) => (
         <View key={item.id}>
-          <TouchableOpacity
-            style={styles.card}
-            activeOpacity={0.7}
-            onPress={() => handleNewsPress(item)}
-          >
-            <Image
+          <Card style={styles.card}>
+            <Card.Cover
               source={{ uri: `http://212.192.134.23/uploads/${item.image}` }}
-              style={styles.image}
-              resizeMode="contain"
             />
-            <Text style={styles.title}>{item.title}</Text>
-            <View style={styles.categoryContainer}>
-  {item.category === 'Профком' ? (
+            <Card.Content>
+              <Title style={styles.title}>{item.title}</Title>
+              <View style={styles.categoryContainer}>
+                  {item.category === 'Профком' ? (
     <TouchableOpacity onPress={() => Linking.openURL('https://vk.com/profcomkubsu')}>
       <Text style={styles.link}>{item.category}</Text>
     </TouchableOpacity>
@@ -253,23 +255,25 @@ const MeropriatiaScreen = () => {
       <Text style={styles.faculty}>{` (${item.faculty})`}</Text>
     </TouchableOpacity>
   )}
-</View>
-
-         
-{isNewsExpanded(item.id) ? (
-  <ScrollView style={styles.content}>
-    <TouchableOpacity
-      onPress={() => {}}
-      onLongPress={async () => {
-        await Clipboard.setStringAsync(item.content);
-        ToastAndroid.show('Текст скопирован', ToastAndroid.SHORT);
-      }}
-    >
-      <Text>{makeLinksClickable(item.content)}</Text>
-    </TouchableOpacity>
-  </ScrollView>
-) : (
-<Text style={styles.content}>{item.content.substring(0, 100)}...</Text>)}
+ </View>
+              {isNewsExpanded(item.id) ? (
+                <ScrollView style={styles.content}>
+                  <TouchableOpacity
+                    onPress={() => {}}
+                    onLongPress={async () => {
+                      await Clipboard.setStringAsync(item.content);
+                      ToastAndroid.show('Текст скопирован', ToastAndroid.SHORT);
+                    }}
+                  >
+                    <Paragraph>{makeLinksClickable(item.content)}</Paragraph>
+                  </TouchableOpacity>
+                </ScrollView>
+              ) : (
+                <Paragraph style={styles.content}>
+                  {item.content.substring(0, 100)}...
+                </Paragraph>
+              )}
+            </Card.Content>
             <View style={styles.cardBottom}>
               <Text style={styles.date}>{formatDate(item.date)}</Text>
               <TouchableOpacity
@@ -284,27 +288,25 @@ const MeropriatiaScreen = () => {
               </TouchableOpacity>
             </View>
             <TouchableOpacity
-  style={styles.readMoreButton}
-  onPress={() => toggleNewsExpansion(item.id)}
->
-  <Text style={styles.readMoreButtonText}>
-    {isNewsExpanded(item.id) ? 'Свернуть' : 'Подробнее'}
-  </Text>
-</TouchableOpacity>
-
-          </TouchableOpacity>
+              style={styles.readMoreButton}
+              onPress={() => toggleNewsExpansion(item.id)}
+            >
+              <Text style={styles.readMoreButtonText}>
+                {isNewsExpanded(item.id) ? 'Свернуть' : 'Подробнее'}
+              </Text>
+            </TouchableOpacity>
+          </Card>
         </View>
       ))}
     </ScrollView>
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
     padding: 16,
-    backgroundColor: '#FFFFFF', 
   },
   menu: {
     marginBottom: 16,
@@ -314,36 +316,33 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     marginRight: 8,
-    backgroundColor: '#007AFF', 
+    backgroundColor: '#007AFF',
     elevation: 2,
   },
   selectedMenuItem: {
-    backgroundColor: '#FFFFFF', 
+    backgroundColor: '#FFFFFF',
   },
   menuItemText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#FFFFFF', 
+    color: '#FFFFFF',
   },
   selectedMenuItemText: {
-    color: '#007AFF', 
+    color: '#007AFF',
   },
   heading: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
-    color: '#007AFF', 
+    color: '#007AFF',
   },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    padding: 12,
+    padding: 16,
     marginBottom: 16,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
-    overflow: 'hidden', 
+    borderRadius: 10,
+    elevation: 4,
   },
   image: {
     width: '100%',
@@ -351,7 +350,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderRadius: 4,
   },
-   cardBottom: {
+  cardBottom: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -359,7 +358,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderTopWidth: 1,
     borderColor: '#ccc',
-    
   },
   title: {
     fontSize: 18,
@@ -380,7 +378,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#888888',
   },
-  
   readMoreButton: {
     backgroundColor: '#007AFF',
     borderRadius: 8,
@@ -395,18 +392,17 @@ const styles = StyleSheet.create({
   },
   favoriteButton: {
     marginLeft: 8,
-    
   },
   favoriteButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#FFFFFF', 
+    color: '#FFFFFF',
     textAlign: 'center',
   },
   modalContainer: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#FFFFFF', 
+    backgroundColor: '#FFFFFF',
   },
   modalContent: {
     backgroundColor: '#FFFFFF',
@@ -431,7 +427,7 @@ const styles = StyleSheet.create({
     color: '#888888',
     marginBottom: 8,
   },
-  modalContent: {
+  modalContentText: {
     fontSize: 18,
     marginBottom: 8,
   },
@@ -444,7 +440,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#007BFF',
     borderRadius: 16,
     padding: 8,
-
   },
   closeButtonText: {
     fontSize: 16,
@@ -452,10 +447,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     textAlign: 'center',
   },
-   faculty: {
+  faculty: {
     fontSize: 13,
     color: 'gray',
-
   },
 });
 

@@ -30,7 +30,7 @@ const LoginScreen = () => {
 
       if (response.ok) {
         setMessage(data.message);
-        navigation.navigate('Мероприятия'); // Navigate to Meropriatia.js
+        navigation.navigate('Мероприятия'); 
       } else {
         throw new Error(data.error);
       }
@@ -50,7 +50,7 @@ const LoginScreen = () => {
     >
       <View style={styles.container}>
         <View style={styles.formContainer}>
-          <Text style={styles.title}>Добропожаловать</Text>
+          <Text style={styles.title}>Добро пожаловать</Text>
           <View style={styles.formGroup}>
             <Text style={styles.label}>Логин:</Text>
             <TextInput
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-end' // Изменено с 'center' на 'flex-end'
+    justifyContent: 'flex-end'
   },
   button: {
     backgroundColor: '#007BFF',
@@ -113,8 +113,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 30,
     borderRadius: 10,
-    width: '100%', // Добавлено
-    marginHorizontal: 0 // Добавлено
+    width: '100%', 
+    marginHorizontal: 0 
   },
   title: {
     fontSize: 32,
