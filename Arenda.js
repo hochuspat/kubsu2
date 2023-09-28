@@ -18,7 +18,7 @@ const Arenda = () => {
 
   const getAds = async () => {
     try {
-      const response = await fetch('http://192.168.0.59:3002/ads');
+      const response = await fetch('http://212.192.134.23/ads');
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }

@@ -1,28 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, Image, TouchableOpacity, Linking } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import * as Animatable from 'react-native-animatable';
 
 const ProfileScreen = ({ navigation }) => {
   const [user, setUser] = useState({});
   const [buttons, setButtons] = useState([]);
 
   useEffect(() => {
-    fetch('http://192.168.0.59:3002/user')
+    fetch('http://212.192.134.23/user')
       .then((response) => response.json())
       .then((data) => setUser(data))
       .catch((error) => console.error(error));
 
-    fetch('http://192.168.0.59:3002/buttons')
+    fetch('http://212.192.134.23/buttons')
       .then((response) => response.json())
       .then((data) => setButtons(data))
       .catch((error) => console.error(error));
   }, []);
 
+  useEffect(() => {
+    // Log the user state after it has been updated
+    console.log(user);
+  }, [user]); // Add user as a dependency
+
+
 
   return (
     <View style={styles.container}>
-      <Animatable.View animation="fadeInUp" duration={1000} delay={500} style={styles.profileContainer}>
+      <View animation="fadeInUp" duration={1000} delay={500} style={styles.profileContainer}>
         <View style={styles.avatar}>
           {user.photo ? (
             <Image style={styles.avatarImage} source={{ uri: user.photo }} />
@@ -31,13 +36,14 @@ const ProfileScreen = ({ navigation }) => {
           )}
         </View>
         <View style={styles.profile}>
-          <Text style={styles.name}>{user.name}</Text>
+          <Text style={styles.name}>Лучший студент</Text>
+          
           <Text style={styles.info}>
-            {user.faculty}, {user.course}
+          Лучший факультет, лучший курс
           </Text>
         </View>
-      </Animatable.View>
-      <Animatable.View animation="fadeInUp" duration={1000} delay={500} style={styles.buttons}>
+      </View>
+      <View animation="fadeInUp" duration={1000} delay={500} style={styles.buttons}>
         {buttons.map((button, index) => (
           <TouchableOpacity key={index} onPress={() => navigation.navigate(button.screen)}>
             <View style={styles.buttonContainer}>
@@ -48,8 +54,8 @@ const ProfileScreen = ({ navigation }) => {
             </View>
           </TouchableOpacity>
         ))}
-      </Animatable.View>
-      <Animatable.View animation="fadeInUp" duration={1000} delay={500} style={styles.additionalOptions}>
+      </View>
+      <View animation="fadeInUp" duration={1000} delay={500} style={styles.additionalOptions}>
         <TouchableOpacity
           onPress={() => {
             const telegramBotUrl = 'https://t.me/StudentsLifeKubsu_bot';
@@ -64,7 +70,7 @@ const ProfileScreen = ({ navigation }) => {
             <Text style={styles.additionalOptionsButtonText}>Дополнительные возможности</Text>
           </View>
         </TouchableOpacity>
-      </Animatable.View>
+      </View>
     </View>
   );
 };
@@ -101,14 +107,12 @@ const styles = StyleSheet.create({
   },
   name: {
     color: '#FFF',
-    fontFamily: 'Abel',
     fontSize: 16,
     fontWeight: '400',
     lineHeight: 16,
   },
   info: {
     color: '#9398A1',
-    fontFamily: 'Abel',
     fontSize: 12,
     fontWeight: '400',
     lineHeight: 12,
@@ -151,7 +155,6 @@ const styles = StyleSheet.create({
   },
   additionalOptionsButtonText: {
     color: '#FFF',
-    fontFamily: 'Abel',
     fontSize: 16,
     fontWeight: '400',
     lineHeight: 16,

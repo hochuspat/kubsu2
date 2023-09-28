@@ -115,7 +115,7 @@ const Details = ({ route }) => {
 
   const getAd = async (id) => {
     try {
-      const response = await fetch(`http://192.168.0.59:3002/ads/${id}`);
+      const response = await fetch(`http://212.192.134.23/ads/${id}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -130,7 +130,7 @@ const Details = ({ route }) => {
 
   const getLandlordData = async () => {
     try {
-      const response = await fetch(`http://192.168.0.59:3002/landlord`);
+      const response = await fetch(`http://212.192.134.23/landlord`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }

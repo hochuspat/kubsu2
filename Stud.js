@@ -30,7 +30,7 @@ class OrganizationList extends Component {
   };
 
   componentDidMount() {
-    fetch('http://192.168.0.59:3002/organizations')
+    fetch('http://212.192.134.23/organizations')
       .then((response) => response.json())
       .then((data) => this.setState({ organizations: data })) 
       .catch((error) => console.error(error));

@@ -10,7 +10,7 @@ const App = () => {
     // Функция для получения данных о стажировках с сервера
     const fetchInternships = async () => {
       try {
-        const response = await fetch('http://192.168.0.59:3002/internships'); // Замените URL на фактический адрес вашего сервера
+        const response = await fetch('http://212.192.134.23/internships'); // Замените URL на фактический адрес вашего сервера
         const data = await response.json();
         setInternships(data);
       } catch (error) {

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="ru">
+    <title>Редактор новостей</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f2f2f2;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        max-width: 500px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      form label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+      }
+
+      form input,
+      form textarea {
+        margin-bottom: 10px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      form button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      form button:hover {
+        background-color: #45a049;
+      }
+
+      .message {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f2f2f2;
+        border-radius: 4px;
+        color: #333;
+      }
+
+      .error {
+        color: red;
+      }
+
+      .news-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+
+      .news-card {
+        width: calc(33.33% - 20px);
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .news-card h2 {
+        margin-top: 0;
+        color: #333;
+      }
+
+      .news-card p {
+        margin: 10px 0;
+        color: #666;
+      }
+
+      .news-card img {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 4px;
+      }
+
+      .edit-form {
+        display: none;
+      }
+
+      .edit-form input,
+      .edit-form textarea {
+        margin-bottom: 10px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .edit-form button {
+        padding: 5px 10px;
+        font-size: 14px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .edit-form button:hover {
+        background-color: #45a049;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 10px;
+        }
+
+        form {
+          max-width: 100%;
+        }
+
+        .news-card {
+          width: 100%;
+        }
+      }
+      .delete-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+  background-color: #ff7875;
+}
+
+.edit-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.edit-button:hover {
+  background-color: #40a9ff;
+}
+/* Добавляем стили для панели навигации */
+.navigation-panel {
+  background-color: #333;
+  color: white;
+  width: 250px;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+}
+
+.navigation-panel ul {
+  list-style: none;
+  padding: 0;
+}
+
+.navigation-panel ul li {
+  padding: 10px;
+}
+
+.navigation-panel ul li a {
+  text-decoration: none;
+  color: white;
+}
+
+.navigation-panel ul li a:hover {
+  text-decoration: underline;
+}
+
+.menu-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        cursor: pointer;
+        z-index: 2;
+        color: white;
+      }
+
+      /* Скрытая панель навигации */
+      .navigation-panel {
+        background-color: #333;
+        color: white;
+        width: 0;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        overflow-y: auto;
+        transition: width 0.3s ease;
+      }
+
+      .navigation-panel.open {
+        width: 250px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Добавляем кнопку меню -->
+    <div class="menu-button" onclick="toggleNav()">Меню</div>
+
+    <div class="navigation-panel">
+      <ul>
+        <li><a href="#">Главная</a></li>
+        <li><a href="#">Новости</a></li>
+        <li><a href="#">О нас</a></li>
+        <li><a href="#">Контакты</a></li>
+      </ul>
+    </div>
+
+    <!-- Добавляем кнопку меню -->
+    <div class="menu-button" onclick="toggleNav()">Меню</div>  
+    <h1>Редактор новостей</h1>
+    <form id="newsForm">
+      <label for="title">Заголовок:</label>
+      <input type="text" id="title" name="title" required>
+
+      <label for="category">Категория:</label>
+      <select id="category" name="category" required>
+        <option value="">Выберите категорию</option>
+        <option value="Профком">Профком</option>
+        <option value="Студсовет">Студсовет</option>
+        <option value="СНО">СНО</option>
+        <option value="МКДЦ">МКДЦ</option>
+        <option value="Волонтерский центр">Волонтерский центр</option>
+        <option value="Научная библиотека">Научная библиотека</option>
+        <option value="Точка кипения">Точка кипения</option>
+        <option value="ФК КубГУ">ФК КубГУ</option>
+      </select>
+      <label for="faculty">Факультет:</label>
+      <select id="faculty" name="faculty">
+        <option value="">Выберите факультет</option>
+        <option value="Биологический факультет">Биологический факультет</option>
+        <option value="Факультет архитектуры и дизайна">Факультет архитектуры и дизайна</option>
+        <option value="Факультет журналистики">Факультет журналистики</option>
+        <option value="Факультет истории, социологии и международных отношений">Факультет истории, социологии и международных отношений</option>
+        <option value="Факультет компьютерных технологий и прикладной математики">Факультет компьютерных технологий и прикладной математики</option>
+        <option value="Факультет математики и компьютерных наук">Факультет математики и компьютерных наук</option>
+        <option value="Факультет педагогики, психологии и коммуникативистики">Факультет педагогики, психологии и коммуникативистики</option>
+        <option value="Факультет романо-германской филологии">Факультет романо-германской филологии</option>
+        <option value="Факультет управления и психологии">Факультет управления и психологии</option>
+        <option value="Факультет химии и высоких технологий">Факультет химии и высоких технологий</option>
+        <option value="Физико-технический факультет">Физико-технический факультет</option>
+        <option value="Филологический факультет">Филологический факультет</option>
+        <option value="Художественно-графический факультет">Художественно-графический факультет</option>
+        <option value="Экономический факультет">Экономический факультет</option>
+        <option value="Юридический факультет">Юридический факультет</option>
+        <option value="Институт географии, геологии, туризма и сервиса">Институт географии, геологии, туризма и сервиса</option>
+    </select>
+      <label for="content">Содержание:</label>
+      <textarea id="content" name="content" rows="5" required></textarea>
+
+      <label for="date">Дата мероприятия:</label>
+      <input type="date" id="date" name="date" required>
+
+      <label for="image">Изображение:</label>
+      <input type="file" id="image" name="image">
+
+      <button type="submit">Добавить новость</button>
+    </form>
+
+    <div id="messageContainer"></div>
+
+    <h2>Существующие новости</h2>
+    <div id="newsContainer" class="news-container"></div>
+
+    <div id="editFormContainer" class="edit-form">
+      <h2>Редактирование новости</h2>
+      <form id="editForm">
+        <input type="hidden" id="editId" name="id">
+
+        <label for="editTitle">Заголовок:</label>
+        <input type="text" id="editTitle" name="title" required>
+
+        <label for="editCategory">Категория:</label>
+        <select id="editCategory" name="category" required>
+          <option value="">Выберите категорию</option>
+          <option value="Профком">Профком</option>
+          <option value="Студсовет">Студсовет</option>
+          <option value="СНО">СНО</option>
+          <option value="МКДЦ">МКДЦ</option>
+          <option value="Волонтерский центр">Волонтерский центр</option>
+          <option value="Научная библиотека">Научная библиотека</option>
+          <option value="Точка кипения">Точка кипения</option>
+          <option value="ФК КубГУ">ФК КубГУ</option>
+        </select>
+        <label for="editFaculty">Факультет:</label>
+        <select id="editFaculty" name="faculty">
+          <option value="">Выберите факультет</option>
+          <option value="Биологический факультет">Биологический факультет</option>
+          <option value="Факультет архитектуры и дизайна">Факультет архитектуры и дизайна</option>
+          <option value="Факультет журналистики">Факультет журналистики</option>
+          <option value="Факультет истории, социологии и международных отношений">Факультет истории, социологии и международных отношений</option>
+          <option value="Факультет компьютерных технологий и прикладной математики">Факультет компьютерных технологий и прикладной математики</option>
+          <option value="Факультет математики и компьютерных наук">Факультет математики и компьютерных наук</option>
+          <option value="Факультет педагогики, психологии и коммуникативистики">Факультет педагогики, психологии и коммуникативистики</option>
+          <option value="Факультет романо-германской филологии">Факультет романо-германской филологии</option>
+          <option value="Факультет управления и психологии">Факультет управления и психологии</option>
+          <option value="Факультет химии и высоких технологий">Факультет химии и высоких технологий</option>
+          <option value="Физико-технический факультет">Физико-технический факультет</option>
+          <option value="Филологический факультет">Филологический факультет</option>
+          <option value="Художественно-графический факультет">Художественно-графический факультет</option>
+          <option value="Экономический факультет">Экономический факультет</option>
+          <option value="Юридический факультет">Юридический факультет</option>
+          <option value="Институт географии, геологии, туризма и сервиса">Институт географии, геологии, туризма и сервиса</option>
+          </select>
+
+        <label for="editContent">Содержание:</label>
+        <textarea id="editContent" name="content" rows="5" required></textarea>
+
+        <label for="editDate">Дата мероприятия:</label>
+        <input type="date" id="editDate" name="date" required>
+
+        <label for="editImage">Изображение:</label>
+        <input type="file" id="editImage" name="image">
+
+        <button type="submit">Сохранить изменения</button>
+        <button type="button" id="cancelEdit">Отмена</button>
+        
+      </form>
+    </div>
+<script>
+    const form = document.getElementById('newsForm');
+    const messageContainer = document.getElementById('messageContainer');
+    const newsContainer = document.getElementById('newsContainer');
+    const editFormContainer = document.getElementById('editFormContainer');
+    const editForm = document.getElementById('editForm');
+    const cancelEditButton = document.getElementById('cancelEdit');
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      messageContainer.innerHTML = '';
+
+      const formData = new FormData(form);
+      const xhr = new XMLHttpRequest();
+
+      xhr.open('POST', 'http://212.192.134.23/news');
+      xhr.onload = function () {
+        const response = JSON.parse(xhr.responseText);
+        const message = document.createElement('div');
+
+        if (xhr.status === 200) {
+          message.textContent = response.message;
+          message.classList.add('message');
+        } else {
+          message.textContent = response.error;
+          message.classList.add('message', 'error');
+        }
+
+        messageContainer.appendChild(message);
+        form.reset();
+
+        // Refresh the news cards
+        getNews();
+      };
+
+      xhr.send(formData);
+    });
+
+// Get existing news
+// Get existing news
+function getNews() {
+  const xhr = new XMLHttpRequest();
+
+  xhr.open('GET', 'http://212.192.134.23/news');
+  xhr.onload = function () {
+    const response = JSON.parse(xhr.responseText);
+
+    if (xhr.status === 200) {
+      renderNews(response);
+    }
+  };
+
+  xhr.send();
+}
+
+    // Render news cards
+    function renderNews(news) {
+  newsContainer.innerHTML = '';
+
+  news.forEach((item) => {
+    const card = document.createElement('div');
+    card.classList.add('news-card');
+
+    const title = document.createElement('h2');
+    title.textContent = item.title;
+
+    const category = document.createElement('p');
+    category.textContent = 'Категория: ' + item.category;
+
+    const content = document.createElement('p');
+    content.textContent = item.content;
+
+    const imageContainer = document.createElement('div');
+    const image = document.createElement('img');
+    if (item.image) {
+      image.src = 'http://212.192.134.23/uploads/' + item.image;
+      image.alt = item.title;
+      imageContainer.appendChild(image);
+    }
+
+    const deleteButton = document.createElement('button');
+deleteButton.textContent = 'Удалить';
+deleteButton.classList.add('delete-button');
+deleteButton.addEventListener('click', () => deleteNews(item.id));
+
+const editButton = document.createElement('button');
+editButton.textContent = 'Редактировать';
+editButton.classList.add('edit-button');
+editButton.addEventListener('click', () => showEditForm(item));
+
+
+    card.appendChild(title);
+    card.appendChild(category);
+    card.appendChild(content);
+    card.appendChild(imageContainer);
+    card.appendChild(deleteButton);
+    card.appendChild(editButton);
+
+    newsContainer.appendChild(card);
+  });
+}
+  // Delete news
+  function deleteNews(newsId) {
+    const xhr = new XMLHttpRequest();
+
+    xhr.open('DELETE', 'http://212.192.134.23/news/' + newsId);
+    xhr.onload = function () {
+      const response = JSON.parse(xhr.responseText);
+
+      if (xhr.status === 200) {
+        // Успешно удалено
+        const message = document.createElement('div');
+        message.textContent = response.message;
+        message.classList.add('message');
+        messageContainer.appendChild(message);
+
+        // Refresh the news cards
+        getNews();
+      } else {
+        // Ошибка при удалении
+        const message = document.createElement('div');
+        message.textContent = response.error;
+        message.classList.add('message', 'error');
+        messageContainer.appendChild(message);
+      }
+    };
+
+    xhr.send();
+  }
+
+    // Show edit form
+    function showEditForm(newsItem){
+      editFormContainer.style.display = 'block';
+
+      // Set values in the edit form
+      document.getElementById('editId').value = newsItem.id;
+      document.getElementById('editTitle').value = newsItem.title;
+      document.getElementById('editCategory').value = newsItem.category;
+      document.getElementById('editContent').value = newsItem.content;
+    }
+
+    // Cancel edit
+    cancelEditButton.addEventListener('click', () => {
+      editFormContainer.style.display = 'none';
+      editForm.reset();
+    });
+
+    // Edit news
+    editForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      messageContainer.innerHTML = '';
+
+      const formData = new FormData(editForm);
+      const xhr = new XMLHttpRequest();
+      const newsId = document.getElementById('editId').value;
+
+      xhr.open('PUT', 'http://212.192.134.23/news/' + newsId);
+      xhr.onload = function () {
+        const response = JSON.parse(xhr.responseText);
+        const message = document.createElement('div');
+
+        if (xhr.status === 200) {
+          message.textContent = response.message;
+          message.classList.add('message');
+        } else {
+          message.textContent = response.error;
+          message.classList.add('message', 'error');
+        }
+
+        messageContainer.appendChild(message);
+        editForm.reset();
+        editFormContainer.style.display = 'none';
+
+        // Refresh the news cards
+        getNews();
+      };
+
+      xhr.send(formData);
+    });
+
+    // Initial load
+    getNews();
+    function toggleNav() {
+        const navigationPanel = document.querySelector('.navigation-panel');
+        navigationPanel.classList.toggle('open');
+      }
+    </script>
+  </body>
+</html>

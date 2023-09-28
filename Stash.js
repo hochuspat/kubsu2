@@ -21,7 +21,7 @@ const InternshipScreen = () => {
   const [internships, setInternships] = useState([]);
 
   useEffect(() => {
-    fetch('http://192.168.0.59:3002/internships') 
+    fetch('http://212.192.134.23/internships') 
       .then((response) => response.json())
       .then((data) => setInternships(data))
       .catch((error) => console.error(error));

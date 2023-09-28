@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="ru">
+    <title>Редактор новостей</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f2f2f2;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        max-width: 500px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      form label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+      }
+
+      form input,
+      form textarea {
+        margin-bottom: 10px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      form button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      form button:hover {
+        background-color: #45a049;
+      }
+
+      .message {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f2f2f2;
+        border-radius: 4px;
+        color: #333;
+      }
+
+      .error {
+        color: red;
+      }
+
+      .news-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+
+      .news-card {
+        width: calc(33.33% - 20px);
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .news-card h2 {
+        margin-top: 0;
+        color: #333;
+      }
+
+      .news-card p {
+        margin: 10px 0;
+        color: #666;
+      }
+
+      .news-card img {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 4px;
+      }
+
+      .edit-form {
+        display: none;
+      }
+
+      .edit-form input,
+      .edit-form textarea {
+        margin-bottom: 10px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .edit-form button {
+        padding: 5px 10px;
+        font-size: 14px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .edit-form button:hover {
+        background-color: #45a049;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 10px;
+        }
+
+        form {
+          max-width: 100%;
+        }
+
+        .news-card {
+          width: 100%;
+        }
+      }
+      .delete-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+  background-color: #ff7875;
+}
+
+.edit-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.edit-button:hover {
+  background-color: #40a9ff;
+}
+/* Добавляем стили для панели навигации */
+.navigation-panel {
+  background-color: #333;
+  color: white;
+  width: 250px;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+}
+
+.navigation-panel ul {
+  list-style: none;
+  padding: 0;
+}
+
+.navigation-panel ul li {
+  padding: 10px;
+}
+
+.navigation-panel ul li a {
+  text-decoration: none;
+  color: white;
+}
+
+.navigation-panel ul li a:hover {
+  text-decoration: underline;
+}
+
+.menu-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        cursor: pointer;
+        z-index: 2;
+        color: white;
+      }
+
+      /* Скрытая панель навигации */
+      .navigation-panel {
+        background-color: #333;
+        color: white;
+        width: 0;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        overflow-y: auto;
+        transition: width 0.3s ease;
+      }
+
+      .navigation-panel.open {
+        width: 250px;
+      }
+      .news-card img {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Добавляем кнопку меню -->
+    <div class="menu-button" onclick="toggleNav()">Меню</div>
+
+    <div class="navigation-panel">
+      <ul>
+        <li><a href="#">Главная</a></li>
+        <li><a href="#">Новости</a></li>
+        <li><a href="#">О нас</a></li>
+        <li><a href="#">Контакты</a></li>
+      </ul>
+    </div>
+
+    <!-- Добавляем кнопку меню -->
+    <div class="menu-button" onclick="toggleNav()">Меню</div>  
+    <h1>Редактор новостей</h1>
+    <form id="newsForm">
+<!-- Форма для добавления и редактирования объявлений -->
+<form id="adForm">
+  <input type="hidden" id="adId" name="id"> <!-- Добавляем скрытое поле для идентификации объявления -->
+
+  <label for="title">Заголовок:</label>
+  <input type="text" id="title" name="title" required>
+
+  <label for="description">Описание:</label>
+  <textarea id="description" name="description" rows="5" required></textarea>
+
+  <label for="price">Цена:</label>
+  <input type="number" id="price" name="price" required>
+
+  <label for="address">Адрес:</label>
+  <input type="text" id="address" name="address" required>
+
+  <label for="latitude">Широта:</label>
+  <input type="text" id="latitude" name="latitude" required>
+
+  <label for="longitude">Долгота:</label>
+  <input type="text" id="longitude" name="longitude" required>
+
+  <label for="area">Площадь:</label>
+  <input type="text" id="area" name="area" required>
+
+  <label for="rooms">Количество комнат:</label>
+  <input type="number" id="rooms" name="rooms" required>
+
+  <label for="floor">Этаж:</label>
+  <input type="number" id="floor" name="floor" required>
+
+  <label for="elevator">Лифт:</label>
+  <input type="number" id="elevator" name="elevator" required>
+
+  <label for="balcony">Балкон:</label>
+  <input type="number" id="balcony" name="balcony" required>
+
+  <label for="furniture">Мебель:</label>
+  <input type="number" id="furniture" name="furniture" required>
+
+  <label for="appliances">Бытовая техника:</label>
+  <input type="number" id="appliances" name="appliances" required>
+
+  <label for="type">Тип недвижимости:</label>
+  <input type="text" id="type" name="type" required>
+
+  <label for="internet">Интернет:</label>
+  <input type="number" id="internet" name="internet" required>
+
+  <label for="img">Ссылка на изображение:</label>
+  <input type="text" id="img" name="img" required>
+
+  <button type="submit">Добавить/Сохранить объявление</button>
+</form>
+    </form>
+
+    <div id="messageContainer"></div>
+
+    <h2>Существующие новости</h2>
+    <div id="newsContainer" class="news-container">
+      <img src="" alt="Изображение объявления" id="adImage">
+    </div>
+
+    <div id="editFormContainer" class="edit-form">     
+       <h2>Редактирование объявления</h2>
+      <form id="editForm">
+        <input type="hidden" id="editId" name="id">
+    
+        <label for="editTitle">Заголовок:</label>
+        <input type="text" id="editTitle" name="title" required>
+    
+        <label for="editDescription">Описание:</label>
+        <textarea id="editDescription" name="description" rows="5" required></textarea>
+    
+        <label for="editPrice">Цена:</label>
+        <input type="number" id="editPrice" name="price" required>
+    
+        <label for="editAddress">Адрес:</label>
+        <input type="text" id="editAddress" name="address" required>
+    
+        <label for="editLatitude">Широта:</label>
+        <input type="text" id="editLatitude" name="latitude" required>
+    
+        <label for="editLongitude">Долгота:</label>
+        <input type="text" id="editLongitude" name="longitude" required>
+    
+        <label for="editArea">Площадь:</label>
+        <input type="text" id="editArea" name="area" required>
+    
+        <label for="editRooms">Количество комнат:</label>
+        <input type="number" id="editRooms" name="rooms" required>
+    
+        <label for="editFloor">Этаж:</label>
+        <input type="number" id="editFloor" name="floor" required>
+    
+        <label for="editElevator">Лифт:</label>
+        <input type="number" id="editElevator" name="elevator" required>
+    
+        <label for="editBalcony">Балкон:</label>
+        <input type="number" id="editBalcony" name="balcony" required>
+    
+        <label for="editFurniture">Мебель:</label>
+        <input type="number" id="editFurniture" name="furniture" required>
+    
+        <label for="editAppliances">Бытовая техника:</label>
+        <input type="number" id="editAppliances" name="appliances" required>
+    
+        <label for="editType">Тип недвижимости:</label>
+        <select id="editType" name="type" required>
+          <option value="Квартира">Квартира</option>
+          <option value="Сожитель">Сожитель</option>
+        </select>
+            
+        <label for="editInternet">Интернет:</label>
+        <input type="number" id="editInternet" name="internet" required>
+    
+        <label for="editImg">Ссылка на изображение:</label>
+        <input type="text" id="editImg" name="img" required>
+    
+        <button type="submit">Сохранить изменения</button>
+        <button type="button" id="cancelEdit">Отмена</button>
+      </form>
+    </div>
+    <script>
+      const editForm = document.getElementById('editForm');
+      const editId = document.getElementById('editId');
+      const editTitle = document.getElementById('editTitle');
+      const editDescription = document.getElementById('editDescription');
+      const editPrice = document.getElementById('editPrice');
+      const editAddress = document.getElementById('editAddress');
+      const editLatitude = document.getElementById('editLatitude');
+      const editLongitude = document.getElementById('editLongitude');
+      const editArea = document.getElementById('editArea');
+      const editRooms = document.getElementById('editRooms');
+      const editFloor = document.getElementById('editFloor');
+      const editElevator = document.getElementById('editElevator');
+      const editBalcony = document.getElementById('editBalcony');
+      const editFurniture = document.getElementById('editFurniture');
+      const editAppliances = document.getElementById('editAppliances');
+      const editType = document.getElementById('editType');
+      const editInternet = document.getElementById('editInternet');
+      const editImg = document.getElementById('editImg');
+      const cancelEditButton = document.getElementById('cancelEdit');
+      const newsContainer = document.getElementById('newsContainer');
+      const messageContainer = document.getElementById('messageContainer');
+  
+      // Функция для загрузки объявлений с сервера
+      
+// Функция для загрузки объявлений с сервера
+function getAds() {
+    fetch('http://212.192.134.23/ads')
+        .then((response) => response.json())
+        .then((data) => {
+            // Очищаем текущее содержимое контейнера
+            newsContainer.innerHTML = '';
+
+            // Создаем карточку для каждого объявления и добавляем их в контейнер
+            data.forEach((ad) => {
+                const card = document.createElement('div');
+                card.classList.add('news-card');
+
+                const title = document.createElement('h2');
+                title.textContent = ad.title;
+
+                const description = document.createElement('p');
+                description.textContent = ad.description;
+
+                const price = document.createElement('p');
+                price.textContent = `Цена: ${ad.price} руб.`;
+
+                const address = document.createElement('p');
+                address.textContent = `Адрес: ${ad.address}`;
+
+                const latitude = document.createElement('p');
+                latitude.textContent = `Широта: ${ad.latitude}`;
+
+                const longitude = document.createElement('p');
+                longitude.textContent = `Долгота: ${ad.longitude}`;
+
+                const area = document.createElement('p');
+                area.textContent = `Площадь: ${ad.area} кв. м`;
+
+                const rooms = document.createElement('p');
+                rooms.textContent = `Количество комнат: ${ad.rooms}`;
+
+                const floor = document.createElement('p');
+                floor.textContent = `Этаж: ${ad.floor}`;
+
+                const elevator = document.createElement('p');
+                elevator.textContent = `Лифт: ${ad.elevator}`;
+
+                const balcony = document.createElement('p');
+                balcony.textContent = `Балкон: ${ad.balcony}`;
+
+                const furniture = document.createElement('p');
+                furniture.textContent = `Мебель: ${ad.furniture}`;
+
+                const appliances = document.createElement('p');
+                appliances.textContent = `Бытовая техника: ${ad.appliances}`;
+
+                const type = document.createElement('p');
+                type.textContent = `Тип недвижимости: ${ad.type}`;
+
+                const internet = document.createElement('p');
+                internet.textContent = `Интернет: ${ad.internet}`;
+
+                // Создаем элемент изображения
+                const img = document.createElement('img');
+                img.src = ad.img; // Устанавливаем путь к изображению из объявления
+                img.alt = 'Изображение объявления'; // Альтернативный текст для изображения
+
+                // Добавляем все элементы карточки объявления к карточке
+                card.appendChild(img);
+                card.appendChild(title);
+                card.appendChild(description);
+                card.appendChild(price);
+                card.appendChild(address);
+                card.appendChild(latitude);
+                card.appendChild(longitude);
+                card.appendChild(area);
+                card.appendChild(rooms);
+                card.appendChild(floor);
+                card.appendChild(elevator);
+                card.appendChild(balcony);
+                card.appendChild(furniture);
+                card.appendChild(appliances);
+                card.appendChild(type);
+                card.appendChild(internet);
+
+                const editButton = document.createElement('button');
+editButton.textContent = 'Редактировать';
+editButton.classList.add('edit-button');
+editButton.addEventListener('click', () => {
+    // При нажатии на кнопку "Редактировать", заполняем форму редактирования данными из объявления
+    loadAdToEdit(ad);
+    // Отображаем форму редактирования
+    editFormContainer.style.display = 'block';
+});
+
+// Добавляем кнопку "Редактировать" к карточке объявления
+card.appendChild(editButton);
+                // Добавляем кнопку "Редактировать" для каждой карточки объявления
+                
+                // Добавляем карточку объявления на страницу
+                newsContainer.appendChild(card);
+            });
+        })
+        .catch((error) => {
+            console.error('Ошибка при загрузке объявлений:', error);
+            const errorMessage = document.createElement('div');
+            errorMessage.textContent = 'Ошибка при загрузке объявлений';
+            errorMessage.classList.add('message', 'error');
+            messageContainer.appendChild(errorMessage);
+        });
+}
+
+function loadAdToEdit(ad) {
+    // Заполняем форму редактирования данными из объявления
+    editId.value = ad.id;
+    editTitle.value = ad.title;
+    editDescription.value = ad.description;
+    editPrice.value = ad.price;
+    editAddress.value = ad.address;
+    editLatitude.value = ad.latitude;
+    editLongitude.value = ad.longitude;
+    editArea.value = ad.area;
+    editRooms.value = ad.rooms;
+    editFloor.value = ad.floor;
+    editElevator.value = ad.elevator;
+    editBalcony.value = ad.balcony;
+    editFurniture.value = ad.furniture;
+    editAppliances.value = ad.appliances;
+    editType.value = ad.type;
+    editInternet.value = ad.internet;
+    editImg.value = ad.img;
+}
+
+  // Вызываем функцию для загрузки объявлений при загрузке страницы
+  getAds();
+      editForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        messageContainer.innerHTML = '';
+      
+        const formData = new FormData(editForm);
+        const adId = editId.value;
+      
+        const xhr = new XMLHttpRequest();
+        xhr.open('PUT', `http://212.192.134.23/ads/${adId}`);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function () {
+          const response = JSON.parse(xhr.responseText);
+          const message = document.createElement('div');
+      
+          if (xhr.status === 200) {
+            message.textContent = response.message;
+            message.classList.add('message');
+          } else {
+            message.textContent = response.error;
+            message.classList.add('message', 'error');
+          }
+      
+          messageContainer.appendChild(message);
+          editForm.reset();
+          editFormContainer.style.display = 'none';
+      
+          // Refresh the ads
+          getAds();
+        };
+      
+        const adData = {
+          title: editTitle.value,
+          description: editDescription.value,
+          price: parseFloat(editPrice.value),
+          address: editAddress.value,
+          latitude: editLatitude.value,
+          longitude: editLongitude.value,
+          area: editArea.value,
+          rooms: parseInt(editRooms.value),
+          floor: parseInt(editFloor.value),
+          elevator: parseInt(editElevator.value),
+          balcony: parseInt(editBalcony.value),
+          furniture: parseInt(editFurniture.value),
+          appliances: parseInt(editAppliances.value),
+          type: editType.value,
+          internet: parseInt(editInternet.value),
+          img: editImg.value,
+        };
+      
+        xhr.send(JSON.stringify(adData));
+      });
+        // Initial load
+        getAds();
+    function toggleNav() {
+        const navigationPanel = document.querySelector('.navigation-panel');
+        navigationPanel.classList.toggle('open');
+      }     
+    </script>
+  </body>
+</html>

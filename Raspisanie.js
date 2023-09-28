@@ -40,7 +40,6 @@ const Item = ({ item, onEdit }) => {
   );
 };
 
-
 const Schedule = () => {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [editingLesson, setEditingLesson] = useState(null);
@@ -71,8 +70,11 @@ const Schedule = () => {
   const [loadCode, setLoadCode] = useState('');
 
   useEffect(() => {
-    fetch('http://192.168.0.59:3002/schedule')
-      .then((response) => response.json())
+    fetch('http://212.192.134.23/schedule')
+      .then((response) => {
+        console.log('Response:', response);
+        return response.json();
+      })
       .then((data) => setLessons(data))
       .catch((error) => console.error(error));
   }, []);
@@ -81,12 +83,12 @@ const Schedule = () => {
     setEditingLesson(null);
     setModalVisible(true);
   };
-  
+
   const openGetScheduleModal = () => {
     setEditingLesson(null);
     setAddScheduleModalVisible(true);
   };
-  
+
   const initialSchedule = {
     Понедельник: [],
     Вторник: [],
@@ -96,6 +98,7 @@ const Schedule = () => {
     Суббота: [],
     Воскресенье: [],
   };
+
   const saveLesson = () => {
     if (
       selectedDayIndex !== null &&
@@ -114,7 +117,7 @@ const Schedule = () => {
         teacher: editingLessonData.teacher,
         classroom: editingLessonData.classroom,
       };
-  
+
       if (editingLesson) {
         const updatedLessons = lessons.map((lesson) =>
           lesson.id === editingLesson.id ? lessonData : lesson
@@ -123,12 +126,11 @@ const Schedule = () => {
       } else {
         setLessons([...lessons, lessonData]);
       }
-  
+
       closeModal();
-      console.log('Занятие сохранено:', lessonData); 
+      console.log('Занятие сохранено:', lessonData);
     }
   };
-  
 
   const closeModal = () => {
     setEditingLesson(null);
@@ -147,6 +149,7 @@ const Schedule = () => {
       classroom: '',
     });
   };
+
   const openEditModal = (lesson) => {
     setEditingLesson(lesson);
     setModalVisible(true);
@@ -166,46 +169,60 @@ const Schedule = () => {
       clearForm();
     }
   };
+
   const generateShareCode = () => {
     const timestamp = Date.now();
     const randomValue = Math.floor(Math.random() * 100000);
     const code = timestamp.toString(36) + randomValue.toString(36);
-    setShareCode(code); 
+    setShareCode(code);
   };
-  
 
   const loadScheduleByCode = () => {
-    fetch(`http://192.168.0.59:3002/share/${loadCode}`)
+    fetch(`http://212.192.134.23/share/${loadCode}`)
       .then((response) => response.json())
       .then((data) => {
         const newSchedule = { ...initialSchedule };
-  
+
         data.forEach((lesson) => {
           if (lesson.day in newSchedule) {
             newSchedule[lesson.day].push(lesson);
           }
         });
-  
+
         setLessons(data);
-  
+
         setLoadedSchedule(newSchedule);
       })
       .catch((error) => console.error(error));
   };
-  
-  
+
   const copyShareCode = () => {
     if (shareCode) {
       Clipboard.setString(shareCode);
       alert('Код скопирован в буфер обмена');
     }
   };
+
   const closeAddScheduleModal = () => {
     setAddScheduleModalVisible(false);
     clearForm();
   };
-    
-  
+
+  const createNewSchedule = () => {
+    fetch('http://212.192.134.23/create-schedule', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ scheduleData: lessons }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setShareCode(data.code);
+      })
+      .catch((error) => console.error(error));
+  };
+
   return (
     <View style={styles.container}>
       <ButtonGroup
@@ -223,167 +240,157 @@ const Schedule = () => {
       </Text>
 
       <FlatList
-  data={
-    loadedSchedule && loadedSchedule[days[selectedDayIndex].value]
-      ? loadedSchedule[days[selectedDayIndex].value]
-      : lessons.filter((lesson) => lesson.day === days[selectedDayIndex].value)
-  }
-  renderItem={({ item }) => <Item item={item} onEdit={openEditModal} />}
-  keyExtractor={(item) => item.id}
-/>
+        data={
+          loadedSchedule && loadedSchedule[days[selectedDayIndex].value]
+            ? loadedSchedule[days[selectedDayIndex].value]
+            : lessons.filter((lesson) => lesson.day === days[selectedDayIndex].value)
+        }
+        renderItem={({ item }) => <Item item={item} onEdit={openEditModal} />}
+        keyExtractor={(item) => item.id}
+      />
 
       <View style={styles.buttonsContainer}>
-  <TouchableOpacity onPress={openAddScheduleModal} style={styles.addButton}>
-    <Text style={styles.addButtonText}>Добавить занятие</Text>
-  </TouchableOpacity>
+        <TouchableOpacity onPress={openAddScheduleModal} style={styles.addButton}>
+          <Text style={styles.addButtonText}>Добавить занятие</Text>
+        </TouchableOpacity>
 
-  <TouchableOpacity onPress={openGetScheduleModal} style={styles.addButtonSmall}>
-    <Text style={styles.addButtonText}>Расписание +</Text>
-  </TouchableOpacity>
-</View>
-
+        <TouchableOpacity onPress={openGetScheduleModal} style={styles.addButtonSmall}>
+          <Text style={styles.addButtonText}>Расписание +</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Модальное окно "Добавить/Редактировать расписание" */}
       <Modal
-  visible={modalVisible}
-  transparent
-  animationType="slide"
-  onRequestClose={() => setModalVisible(false)}
->
-  <View style={styles.modalContainer}>
-    <Text style={styles.modalTitle}>
-      {editingLesson ? 'Редактировать занятие' : 'Добавить новое занятие'}
-    </Text>
-    <Picker
-      selectedValue={selectedDayIndex}
-      onValueChange={(index) => setSelectedDayIndex(index)}
-      style={styles.defaultPicker}
-    >
-      {days.map((day, index) => (
-        <Picker.Item label={day.value} value={index} key={day.value} />
-      ))}
-    </Picker>
-
-    <Text style={styles.label}>Начальное время:</Text>
-    <View style={styles.timePicker}>
-      <Picker
-        selectedValue={editingLessonData.startHour}
-        onValueChange={(itemValue) =>
-          setEditingLessonData((prevData) => ({
-            ...prevData,
-            startHour: itemValue,
-          }))
-        }
-        style={[styles.defaultPicker, { width: '30%' }]}
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
       >
-        {Array.from({ length: 24 }, (_, i) => {
-          const hour = i.toString().padStart(2, '0');
-          return (
-            <Picker.Item label={hour} value={hour} key={hour} />
-          );
-        })}
-      </Picker>
-      <Picker
-        selectedValue={editingLessonData.startMinute}
-        onValueChange={(itemValue) =>
-          setEditingLessonData((prevData) => ({
-            ...prevData,
-            startMinute: itemValue,
-          }))
-        }
-        style={[styles.defaultPicker, { width: '30%' }]}
-      >
-        {Array.from({ length: 60 }, (_, i) => {
-          const minute = i.toString().padStart(2, '0');
-          return (
-            <Picker.Item label={minute} value={minute} key={minute} />
-          );
-        })}
-      </Picker>
-    </View>
-    <Text style={styles.label}>Конечное время:</Text>
-    <View style={styles.timePicker}>
-      <Picker
-        selectedValue={editingLessonData.endHour}
-        onValueChange={(itemValue) =>
-          setEditingLessonData((prevData) => ({
-            ...prevData,
-            endHour: itemValue,
-          }))
-        }
-        style={[styles.defaultPicker, { width: '30%' }]}
-      >
-        {Array.from({ length: 24 }, (_, i) => {
-          const hour = i.toString().padStart(2, '0');
-          return (
-            <Picker.Item label={hour} value={hour} key={hour} />
-          );
-        })}
-      </Picker>
-      <Picker
-        selectedValue={editingLessonData.endMinute}
-        onValueChange={(itemValue) =>
-          setEditingLessonData((prevData) => ({
-            ...prevData,
-            endMinute: itemValue,
-          }))
-        }
-        style={[styles.defaultPicker, { width: '30%' }]}
-      >
-        {Array.from({ length: 60 }, (_, i) => {
-          const minute = i.toString().padStart(2, '0');
-          return (
-            <Picker.Item label={minute} value={minute} key={minute} />
-          );
-        })}
-      </Picker>
-    </View>
-    <TextInput
-      placeholder="Предмет"
-      onChangeText={(text) =>
-        setEditingLessonData((prevData) => ({
-          ...prevData,
-          subject: text,
-        }))
-      }
-      style={styles.input}
-      value={editingLessonData.subject}
-    />
-    <TextInput
-      placeholder="ФИО преподавателя"
-      onChangeText={(text) =>
-        setEditingLessonData((prevData) => ({
-          ...prevData,
-          teacher: text,
-        }))
-      }
-      style={styles.input}
-      value={editingLessonData.teacher}
-    />
-    <TextInput
-      placeholder="Аудитория"
-      onChangeText={(text) =>
-        setEditingLessonData((prevData) => ({
-          ...prevData,
-          classroom: text,
-        }))
-      }
-      style={styles.input}
-      value={editingLessonData.classroom}
-    />
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>
+            {editingLesson ? 'Редактировать занятие' : 'Добавить новое занятие'}
+          </Text>
+          <Picker
+            selectedValue={selectedDayIndex}
+            onValueChange={(index) => setSelectedDayIndex(index)}
+            style={styles.defaultPicker}
+          >
+            {days.map((day, index) => (
+              <Picker.Item label={day.value} value={index} key={day.value} />
+            ))}
+          </Picker>
 
-<TouchableOpacity onPress={saveLesson} style={editingLesson ? styles.saveButton : styles.saveButton}>
-  <Text style={editingLesson ? styles.saveButtonText : styles.saveButtonText}>
-    {editingLesson ? 'Сохранить' : 'Добавить'}
-  </Text>
-</TouchableOpacity>
+          <Text style={styles.label}>Начальное время:</Text>
+          <View style={styles.timePicker}>
+            <Picker
+              selectedValue={editingLessonData.startHour}
+              onValueChange={(itemValue) =>
+                setEditingLessonData((prevData) => ({
+                  ...prevData,
+                  startHour: itemValue,
+                }))
+              }
+              style={[styles.defaultPicker, { width: '30%' }]}
+            >
+              {Array.from({ length: 24 }, (_, i) => {
+                const hour = i.toString().padStart(2, '0');
+                return <Picker.Item label={hour} value={hour} key={hour} />;
+              })}
+            </Picker>
+            <Picker
+              selectedValue={editingLessonData.startMinute}
+              onValueChange={(itemValue) =>
+                setEditingLessonData((prevData) => ({
+                  ...prevData,
+                  startMinute: itemValue,
+                }))
+              }
+              style={[styles.defaultPicker, { width: '30%' }]}
+            >
+              {Array.from({ length: 60 }, (_, i) => {
+                const minute = i.toString().padStart(2, '0');
+                return <Picker.Item label={minute} value={minute} key={minute} />;
+              })}
+            </Picker>
+          </View>
+          <Text style={styles.label}>Конечное время:</Text>
+          <View style={styles.timePicker}>
+            <Picker
+              selectedValue={editingLessonData.endHour}
+              onValueChange={(itemValue) =>
+                setEditingLessonData((prevData) => ({
+                  ...prevData,
+                  endHour: itemValue,
+                }))
+              }
+              style={[styles.defaultPicker, { width: '30%' }]}
+            >
+              {Array.from({ length: 24 }, (_, i) => {
+                const hour = i.toString().padStart(2, '0');
+                return <Picker.Item label={hour} value={hour} key={hour} />;
+              })}
+            </Picker>
+            <Picker
+              selectedValue={editingLessonData.endMinute}
+              onValueChange={(itemValue) =>
+                setEditingLessonData((prevData) => ({
+                  ...prevData,
+                  endMinute: itemValue,
+                }))
+              }
+              style={[styles.defaultPicker, { width: '30%' }]}
+            >
+              {Array.from({ length: 60 }, (_, i) => {
+                const minute = i.toString().padStart(2, '0');
+                return <Picker.Item label={minute} value={minute} key={minute} />;
+              })}
+            </Picker>
+          </View>
+          <TextInput
+            placeholder="Предмет"
+            onChangeText={(text) =>
+              setEditingLessonData((prevData) => ({
+                ...prevData,
+                subject: text,
+              }))
+            }
+            style={styles.input}
+            value={editingLessonData.subject}
+          />
+          <TextInput
+            placeholder="ФИО преподавателя"
+            onChangeText={(text) =>
+              setEditingLessonData((prevData) => ({
+                ...prevData,
+                teacher: text,
+              }))
+            }
+            style={styles.input}
+            value={editingLessonData.teacher}
+          />
+          <TextInput
+            placeholder="Аудитория"
+            onChangeText={(text) =>
+              setEditingLessonData((prevData) => ({
+                ...prevData,
+                classroom: text,
+              }))
+            }
+            style={styles.input}
+            value={editingLessonData.classroom}
+          />
 
+          <TouchableOpacity onPress={saveLesson} style={editingLesson ? styles.saveButton : styles.saveButton}>
+            <Text style={editingLesson ? styles.saveButtonText : styles.saveButtonText}>
+              {editingLesson ? 'Сохранить' : 'Добавить'}
+            </Text>
+          </TouchableOpacity>
 
-    <TouchableOpacity onPress={closeModal} style={styles.cancelButton}>
-      <Text style={styles.cancelButtonText}>Отмена</Text>
-    </TouchableOpacity>
-  </View>
-</Modal>
+          <TouchableOpacity onPress={closeModal} style={styles.cancelButton}>
+            <Text style={styles.cancelButtonText}>Отмена</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
 
       {/* Модальное окно "Поделиться расписанием" */}
       <Modal
@@ -392,32 +399,32 @@ const Schedule = () => {
         animationType="slide"
         onRequestClose={() => setAddScheduleModalVisible(false)}
       >
-  <View style={styles.modalContainer}>
-    <TouchableOpacity onPress={generateShareCode} style={styles.loadButton}>
-      <Text style={styles.saveButtonText}>Поделиться расписанием</Text>
-    </TouchableOpacity>
+        <View style={styles.modalContainer}>
+          <TouchableOpacity onPress={generateShareCode} style={styles.loadButton}>
+            <Text style={styles.saveButtonText}>Поделиться расписанием</Text>
+          </TouchableOpacity>
 
-    <Text style={styles.shareCodeText}>{shareCode}</Text>
+          <Text style={styles.shareCodeText}>{shareCode}</Text>
 
-    <TouchableOpacity onPress={copyShareCode} style={styles.loadButton}>
-      <Text style={styles.saveButtonText}>Копировать код</Text>
-    </TouchableOpacity>
+          <TouchableOpacity onPress={copyShareCode} style={styles.loadButton}>
+            <Text style={styles.saveButtonText}>Копировать код</Text>
+          </TouchableOpacity>
 
-    <TextInput
-      placeholder="Введите код для загрузки расписания"
-      onChangeText={(text) => setLoadCode(text)}
-      style={styles.input}
-      value={loadCode}
-    />
+          <TextInput
+            placeholder="Введите код для загрузки расписания"
+            onChangeText={(text) => setLoadCode(text)}
+            style={styles.input}
+            value={loadCode}
+          />
 
-    <TouchableOpacity onPress={loadScheduleByCode} style={styles.loadButton}>
-      <Text style={styles.saveButtonText}>Загрузить расписание</Text>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={closeAddScheduleModal} style={styles.cancelButton}> 
-      <Text style={styles.cancelButtonText}>Отмена</Text>
-    </TouchableOpacity>
-  </View>
-</Modal>
+          <TouchableOpacity onPress={loadScheduleByCode} style={styles.loadButton}>
+            <Text style={styles.saveButtonText}>Загрузить расписание</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={closeAddScheduleModal} style={styles.cancelButton}>
+            <Text style={styles.cancelButtonText}>Отмена</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };

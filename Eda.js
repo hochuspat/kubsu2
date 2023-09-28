@@ -85,7 +85,7 @@ const WhereToEat = () => {
 
   const loadPartners = async (category) => {
     try {
-      const response = await fetch(`http://192.168.0.59:3002/dataa`);
+      const response = await fetch(`http://212.192.134.23/dataa`);
       const data = await response.json();
   
       const filteredData = data.filter((item) => item.category === category);
