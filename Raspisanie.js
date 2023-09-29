@@ -254,9 +254,9 @@ const Schedule = () => {
           <Text style={styles.addButtonText}>Добавить занятие</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={openGetScheduleModal} style={styles.addButtonSmall}>
+        {/* <TouchableOpacity onPress={openGetScheduleModal} style={styles.addButtonSmall}>
           <Text style={styles.addButtonText}>Расписание +</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       {/* Модальное окно "Добавить/Редактировать расписание" */}
@@ -393,7 +393,7 @@ const Schedule = () => {
       </Modal>
 
       {/* Модальное окно "Поделиться расписанием" */}
-      <Modal
+      {/* <Modal
         visible={addScheduleModalVisible}
         transparent
         animationType="slide"
@@ -424,7 +424,7 @@ const Schedule = () => {
             <Text style={styles.cancelButtonText}>Отмена</Text>
           </TouchableOpacity>
         </View>
-      </Modal>
+      </Modal> */}
     </View>
   );
 };

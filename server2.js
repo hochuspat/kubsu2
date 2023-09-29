@@ -150,33 +150,140 @@ app.get('/ads', (req, res) => {
 // Маршрут для редактирования данных в таблице ads
 app.put('/ads/:id', (req, res) => {
   const adId = req.params.id;
-  const { title, category, content, date, image } = req.body; // Параметры из запроса
+  const {
+    title,
+    description,
+    price,
+    address,
+    latitude,
+    longitude,
+    area,
+    rooms,
+    floor,
+    elevator,
+    balcony,
+    furniture,
+    appliances,
+    type,
+    internet,
+    img
+  } = req.body; // Параметры из запроса
 
   // Выполняем SQL-запрос для обновления данных
-  const sql = 'UPDATE ads SET title=?, category=?, content=?, date=?, image=? WHERE id=?';
-  connection.query(sql, [title, category, content, date, image, adId], (err, result) => {
-    if (err) {
-      console.error('Ошибка выполнения SQL-запроса:', err);
-      res.status(500).json({ error: 'Ошибка сервера' });
-    } else {
-      res.json({ message: 'Данные успешно обновлены' });
+  const sql =
+    'UPDATE ads SET title=?, description=?, price=?, address=?, latitude=?, longitude=?, area=?, rooms=?, floor=?, elevator=?, balcony=?, furniture=?, appliances=?, type=?, internet=?, img=? WHERE id=?';
+  connection.query(
+    sql,
+    [
+      title,
+      description,
+      price,
+      address,
+      latitude,
+      longitude,
+      area,
+      rooms,
+      floor,
+      elevator,
+      balcony,
+      furniture,
+      appliances,
+      type,
+      internet,
+      img,
+      adId
+    ],
+    (err, result) => {
+      if (err) {
+        console.error('Ошибка выполнения SQL-запроса:', err);
+        res.status(500).json({ error: 'Ошибка сервера' });
+      } else {
+        res.json({ message: 'Данные успешно обновлены' });
+      }
     }
-  });
+  );
 });
-// Маршрут для добавления данных в таблицу ads
 app.post('/ads', (req, res) => {
-  const { title, category, content, date, image } = req.body; // Параметры из запроса
+  // Проверка наличия всех обязательных полей в запросе
+  const requiredFields = [
+    'title',
+    'description',
+    'price',
+    'address',
+    'latitude',
+    'longitude',
+    'area',
+    'rooms',
+    'floor',
+    'elevator',
+    'balcony',
+    'furniture',
+    'appliances',
+    'type',
+    'internet',
+    'img'
+  ];
+console.log('POST запрос на сервер с данными:', req.body); // Добавьте эту строку
+  for (const field of requiredFields) {
+    if (!(field in req.body)) {
+      res.status(400).json({ error: `Отсутствует обязательное поле: ${field}` });
+      return;
+    }
+  }
+
+  // Если все обязательные поля присутствуют, продолжаем выполнение кода
+  const {
+    title,
+    description,
+    price,
+    address,
+    latitude,
+    longitude,
+    area,
+    rooms,
+    floor,
+    elevator,
+    balcony,
+    furniture,
+    appliances,
+    type,
+    internet,
+    img
+  } = req.body; // Параметры из запроса
 
   // Выполняем SQL-запрос для вставки данных
-  const sql = 'INSERT INTO ads (title, category, content, date, image) VALUES (?, ?, ?, ?, ?)';
-  connection.query(sql, [title, category, content, date, image], (err, result) => {
+  const sql =
+    'INSERT INTO ads (title, description, price, address, latitude, longitude, area, rooms, floor, elevator, balcony, furniture, appliances, type, internet, img) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+connection.query(
+  sql,
+  [
+    title,
+    description,
+    price,
+    address,
+    latitude,
+    longitude,
+    area,
+    rooms,
+    floor,
+    elevator,
+    balcony,
+    furniture,
+    appliances,
+    type,
+    internet,
+    img
+  ],
+  (err, result) => {
     if (err) {
       console.error('Ошибка выполнения SQL-запроса:', err);
       res.status(500).json({ error: 'Ошибка сервера' });
     } else {
+      console.log('Данные успешно добавлены в базу данных');
       res.json({ message: 'Данные успешно добавлены', id: result.insertId });
     }
-  });
+  }
+);
 });
 
 // Маршрут для получения данных из таблицы dataa

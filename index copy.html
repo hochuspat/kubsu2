@@ -252,7 +252,6 @@
     <!-- Добавляем кнопку меню -->
     <div class="menu-button" onclick="toggleNav()">Меню</div>  
     <h1>Редактор новостей</h1>
-    <form id="newsForm">
 <!-- Форма для добавления и редактирования объявлений -->
 <form id="adForm">
   <input type="hidden" id="adId" name="id"> <!-- Добавляем скрытое поле для идентификации объявления -->
@@ -307,7 +306,6 @@
 
   <button type="submit">Добавить/Сохранить объявление</button>
 </form>
-    </form>
 
     <div id="messageContainer"></div>
 
@@ -377,218 +375,289 @@
       </form>
     </div>
     <script>
-      const editForm = document.getElementById('editForm');
-      const editId = document.getElementById('editId');
-      const editTitle = document.getElementById('editTitle');
-      const editDescription = document.getElementById('editDescription');
-      const editPrice = document.getElementById('editPrice');
-      const editAddress = document.getElementById('editAddress');
-      const editLatitude = document.getElementById('editLatitude');
-      const editLongitude = document.getElementById('editLongitude');
-      const editArea = document.getElementById('editArea');
-      const editRooms = document.getElementById('editRooms');
-      const editFloor = document.getElementById('editFloor');
-      const editElevator = document.getElementById('editElevator');
-      const editBalcony = document.getElementById('editBalcony');
-      const editFurniture = document.getElementById('editFurniture');
-      const editAppliances = document.getElementById('editAppliances');
-      const editType = document.getElementById('editType');
-      const editInternet = document.getElementById('editInternet');
-      const editImg = document.getElementById('editImg');
-      const cancelEditButton = document.getElementById('cancelEdit');
-      const newsContainer = document.getElementById('newsContainer');
-      const messageContainer = document.getElementById('messageContainer');
-  
-      // Функция для загрузки объявлений с сервера
       
+const editForm = document.getElementById('editForm');
+const adForm = document.getElementById('adForm');
+const editId = document.getElementById('editId');
+const editTitle = document.getElementById('editTitle');
+const editDescription = document.getElementById('editDescription');
+const editPrice = document.getElementById('editPrice');
+const editAddress = document.getElementById('editAddress');
+const editLatitude = document.getElementById('editLatitude');
+const editLongitude = document.getElementById('editLongitude');
+const editArea = document.getElementById('editArea');
+const editRooms = document.getElementById('editRooms');
+const editFloor = document.getElementById('editFloor');
+const editElevator = document.getElementById('editElevator');
+const editBalcony = document.getElementById('editBalcony');
+const editFurniture = document.getElementById('editFurniture');
+const editAppliances = document.getElementById('editAppliances');
+const editType = document.getElementById('editType');
+const editInternet = document.getElementById('editInternet');
+const editImg = document.getElementById('editImg');
+const cancelEditButton = document.getElementById('cancelEdit');
+debugger;
+const adTitle = document.getElementById('title');
+const adDescription = document.getElementById('description');
+const adPrice = document.getElementById('price');
+const adAddress = document.getElementById('address');
+const adLatitude = document.getElementById('latitude');
+const adLongitude = document.getElementById('longitude');
+const adArea = document.getElementById('area');
+const adRooms = document.getElementById('rooms');
+const adFloor = document.getElementById('floor');
+const adElevator = document.getElementById('elevator');
+const adBalcony = document.getElementById('balcony');
+const adFurniture = document.getElementById('furniture');
+const adAppliances = document.getElementById('appliances');
+const adType = document.getElementById('type');
+const adInternet = document.getElementById('internet');
+const adImg = document.getElementById('img');
+
+const newsContainer = document.getElementById('newsContainer');
+const messageContainer = document.getElementById('messageContainer');
+
 // Функция для загрузки объявлений с сервера
 function getAds() {
-    fetch('http://212.192.134.23/ads')
-        .then((response) => response.json())
-        .then((data) => {
-            // Очищаем текущее содержимое контейнера
-            newsContainer.innerHTML = '';
+  fetch('http://212.192.134.23/ads')
+    .then((response) => response.json())
+    .then((data) => {
+      // Очищаем текущее содержимое контейнера
+      newsContainer.innerHTML = '';
 
-            // Создаем карточку для каждого объявления и добавляем их в контейнер
-            data.forEach((ad) => {
-                const card = document.createElement('div');
-                card.classList.add('news-card');
+      // Создаем карточку для каждого объявления и добавляем их в контейнер
+      data.forEach((ad) => {
+        const card = document.createElement('div');
+        card.classList.add('news-card');
 
-                const title = document.createElement('h2');
-                title.textContent = ad.title;
+        const title = document.createElement('h2');
+        title.textContent = ad.title;
 
-                const description = document.createElement('p');
-                description.textContent = ad.description;
+        const description = document.createElement('p');
+        description.textContent = ad.description;
 
-                const price = document.createElement('p');
-                price.textContent = `Цена: ${ad.price} руб.`;
+        const price = document.createElement('p');
+        price.textContent = `Цена: ${ad.price} руб.`;
 
-                const address = document.createElement('p');
-                address.textContent = `Адрес: ${ad.address}`;
+        const address = document.createElement('p');
+        address.textContent = `Адрес: ${ad.address}`;
 
-                const latitude = document.createElement('p');
-                latitude.textContent = `Широта: ${ad.latitude}`;
+        const latitude = document.createElement('p');
+        latitude.textContent = `Широта: ${ad.latitude}`;
 
-                const longitude = document.createElement('p');
-                longitude.textContent = `Долгота: ${ad.longitude}`;
+        const longitude = document.createElement('p');
+        longitude.textContent = `Долгота: ${ad.longitude}`;
 
-                const area = document.createElement('p');
-                area.textContent = `Площадь: ${ad.area} кв. м`;
+        const area = document.createElement('p');
+        area.textContent = `Площадь: ${ad.area} кв. м`;
 
-                const rooms = document.createElement('p');
-                rooms.textContent = `Количество комнат: ${ad.rooms}`;
+        const rooms = document.createElement('p');
+        rooms.textContent = `Количество комнат: ${ad.rooms}`;
 
-                const floor = document.createElement('p');
-                floor.textContent = `Этаж: ${ad.floor}`;
+        const floor = document.createElement('p');
+        floor.textContent = `Этаж: ${ad.floor}`;
 
-                const elevator = document.createElement('p');
-                elevator.textContent = `Лифт: ${ad.elevator}`;
+        const elevator = document.createElement('p');
+        elevator.textContent = `Лифт: ${ad.elevator}`;
 
-                const balcony = document.createElement('p');
-                balcony.textContent = `Балкон: ${ad.balcony}`;
+        const balcony = document.createElement('p');
+        balcony.textContent = `Балкон: ${ad.balcony}`;
 
-                const furniture = document.createElement('p');
-                furniture.textContent = `Мебель: ${ad.furniture}`;
+        const furniture = document.createElement('p');
+        furniture.textContent = `Мебель: ${ad.furniture}`;
 
-                const appliances = document.createElement('p');
-                appliances.textContent = `Бытовая техника: ${ad.appliances}`;
+        const appliances = document.createElement('p');
+        appliances.textContent = `Бытовая техника: ${ad.appliances}`;
 
-                const type = document.createElement('p');
-                type.textContent = `Тип недвижимости: ${ad.type}`;
+        const type = document.createElement('p');
+        type.textContent = `Тип недвижимости: ${ad.type}`;
 
-                const internet = document.createElement('p');
-                internet.textContent = `Интернет: ${ad.internet}`;
+        const internet = document.createElement('p');
+        internet.textContent = `Интернет: ${ad.internet}`;
 
-                // Создаем элемент изображения
-                const img = document.createElement('img');
-                img.src = ad.img; // Устанавливаем путь к изображению из объявления
-                img.alt = 'Изображение объявления'; // Альтернативный текст для изображения
+        // Создаем элемент изображения
+        const img = document.createElement('img');
+        img.src = ad.img; // Устанавливаем путь к изображению из объявления
+        img.alt = 'Изображение объявления'; // Альтернативный текст для изображения
 
-                // Добавляем все элементы карточки объявления к карточке
-                card.appendChild(img);
-                card.appendChild(title);
-                card.appendChild(description);
-                card.appendChild(price);
-                card.appendChild(address);
-                card.appendChild(latitude);
-                card.appendChild(longitude);
-                card.appendChild(area);
-                card.appendChild(rooms);
-                card.appendChild(floor);
-                card.appendChild(elevator);
-                card.appendChild(balcony);
-                card.appendChild(furniture);
-                card.appendChild(appliances);
-                card.appendChild(type);
-                card.appendChild(internet);
+        // Добавляем все элементы карточки объявления к карточке
+        card.appendChild(img);
+        card.appendChild(title);
+        card.appendChild(description);
+        card.appendChild(price);
+        card.appendChild(address);
+        card.appendChild(latitude);
+        card.appendChild(longitude);
+        card.appendChild(area);
+        card.appendChild(rooms);
+        card.appendChild(floor);
+        card.appendChild(elevator);
+        card.appendChild(balcony);
+        card.appendChild(furniture);
+        card.appendChild(appliances);
+        card.appendChild(type);
+        card.appendChild(internet);
 
-                const editButton = document.createElement('button');
-editButton.textContent = 'Редактировать';
-editButton.classList.add('edit-button');
-editButton.addEventListener('click', () => {
-    // При нажатии на кнопку "Редактировать", заполняем форму редактирования данными из объявления
-    loadAdToEdit(ad);
-    // Отображаем форму редактирования
-    editFormContainer.style.display = 'block';
-});
-
-// Добавляем кнопку "Редактировать" к карточке объявления
-card.appendChild(editButton);
-                // Добавляем кнопку "Редактировать" для каждой карточки объявления
-                
-                // Добавляем карточку объявления на страницу
-                newsContainer.appendChild(card);
-            });
-        })
-        .catch((error) => {
-            console.error('Ошибка при загрузке объявлений:', error);
-            const errorMessage = document.createElement('div');
-            errorMessage.textContent = 'Ошибка при загрузке объявлений';
-            errorMessage.classList.add('message', 'error');
-            messageContainer.appendChild(errorMessage);
+        const editButton = document.createElement('button');
+        editButton.textContent = 'Редактировать';
+        editButton.classList.add('edit-button');
+        editButton.addEventListener('click', () => {
+          // При нажатии на кнопку "Редактировать", заполняем форму редактирования данными из объявления
+          loadAdToEdit(ad);
+          // Отображаем форму редактирования
+          editFormContainer.style.display = 'block';
         });
+
+        // Добавляем кнопку "Редактировать" к карточке объявления
+        card.appendChild(editButton);
+
+        // Добавляем карточку объявления на страницу
+        newsContainer.appendChild(card);
+      });
+    })
+    .catch((error) => {
+      console.error('Ошибка при загрузке объявлений:', error);
+      const errorMessage = document.createElement('div');
+      errorMessage.textContent = 'Ошибка при загрузке объявлений';
+      errorMessage.classList.add('message', 'error');
+      messageContainer.appendChild(errorMessage);
+    });
 }
 
 function loadAdToEdit(ad) {
-    // Заполняем форму редактирования данными из объявления
-    editId.value = ad.id;
-    editTitle.value = ad.title;
-    editDescription.value = ad.description;
-    editPrice.value = ad.price;
-    editAddress.value = ad.address;
-    editLatitude.value = ad.latitude;
-    editLongitude.value = ad.longitude;
-    editArea.value = ad.area;
-    editRooms.value = ad.rooms;
-    editFloor.value = ad.floor;
-    editElevator.value = ad.elevator;
-    editBalcony.value = ad.balcony;
-    editFurniture.value = ad.furniture;
-    editAppliances.value = ad.appliances;
-    editType.value = ad.type;
-    editInternet.value = ad.internet;
-    editImg.value = ad.img;
+  // Заполняем форму редактирования данными из объявления
+  editId.value = ad.id;
+  editTitle.value = ad.title;
+  editDescription.value = ad.description;
+  editPrice.value = ad.price;
+  editAddress.value = ad.address;
+  editLatitude.value = ad.latitude;
+  editLongitude.value = ad.longitude;
+  editArea.value = ad.area;
+  editRooms.value = ad.rooms;
+  editFloor.value = ad.floor;
+  editElevator.value = ad.elevator;
+  editBalcony.value = ad.balcony;
+  editFurniture.value = ad.furniture;
+  editAppliances.value = ad.appliances;
+  editType.value = ad.type;
+  editInternet.value = ad.internet;
+  editImg.value = ad.img;
 }
 
-  // Вызываем функцию для загрузки объявлений при загрузке страницы
-  getAds();
-      editForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        messageContainer.innerHTML = '';
-      
-        const formData = new FormData(editForm);
-        const adId = editId.value;
-      
-        const xhr = new XMLHttpRequest();
-        xhr.open('PUT', `http://212.192.134.23/ads/${adId}`);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onload = function () {
-          const response = JSON.parse(xhr.responseText);
-          const message = document.createElement('div');
-      
-          if (xhr.status === 200) {
-            message.textContent = response.message;
-            message.classList.add('message');
-          } else {
-            message.textContent = response.error;
-            message.classList.add('message', 'error');
-          }
-      
-          messageContainer.appendChild(message);
-          editForm.reset();
-          editFormContainer.style.display = 'none';
-      
-          // Refresh the ads
-          getAds();
-        };
-      
-        const adData = {
-          title: editTitle.value,
-          description: editDescription.value,
-          price: parseFloat(editPrice.value),
-          address: editAddress.value,
-          latitude: editLatitude.value,
-          longitude: editLongitude.value,
-          area: editArea.value,
-          rooms: parseInt(editRooms.value),
-          floor: parseInt(editFloor.value),
-          elevator: parseInt(editElevator.value),
-          balcony: parseInt(editBalcony.value),
-          furniture: parseInt(editFurniture.value),
-          appliances: parseInt(editAppliances.value),
-          type: editType.value,
-          internet: parseInt(editInternet.value),
-          img: editImg.value,
-        };
-      
-        xhr.send(JSON.stringify(adData));
-      });
-        // Initial load
-        getAds();
-    function toggleNav() {
-        const navigationPanel = document.querySelector('.navigation-panel');
-        navigationPanel.classList.toggle('open');
-      }     
+// Вызываем функцию для загрузки объявлений при загрузке страницы
+getAds();
+
+editForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  messageContainer.innerHTML = '';
+
+  const formData = new FormData(editForm);
+  const adId = editId.value;
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('PUT', `http://212.192.134.23/ads/${adId}`);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onload = function () {
+    const response = JSON.parse(xhr.responseText);
+    const message = document.createElement('div');
+
+    if (xhr.status === 200) {
+      message.textContent = response.message;
+      message.classList.add('message');
+    } else {
+      message.textContent = response.error;
+      message.classList.add('message', 'error');
+    }
+
+    messageContainer.appendChild(message);
+    editForm.reset();
+    editFormContainer.style.display = 'none';
+
+    // Обновляем объявления после успешной отправки
+    getAds();
+  };
+
+  const adData = {
+    title: editTitle.value,
+    description: editDescription.value,
+    price: parseFloat(editPrice.value),
+    address: editAddress.value,
+    latitude: editLatitude.value,
+    longitude: editLongitude.value,
+    area: editArea.value,
+    rooms: parseInt(editRooms.value),
+    floor: parseInt(editFloor.value),
+    elevator: parseInt(editElevator.value),
+    balcony: parseInt(editBalcony.value),
+    furniture: parseInt(editFurniture.value),
+    appliances: parseInt(editAppliances.value),
+    type: editType.value,
+    internet: parseInt(editInternet.value),
+    img: editImg.value,
+  };
+
+  xhr.send(JSON.stringify(adData));
+});
+
+// Initial load
+getAds();
+
+adForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  messageContainer.innerHTML = '';
+
+  const formData = new FormData(adForm);
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', `http://212.192.134.23/ads/`);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onload = function () {
+    const response = JSON.parse(xhr.responseText);
+    const message = document.createElement('div');
+
+    if (xhr.status === 200) {
+      message.textContent = response.message;
+      message.classList.add('message');
+    } else {
+      message.textContent = response.error;
+      message.classList.add('message', 'error');
+    }
+
+    messageContainer.appendChild(message);
+    adForm.reset();
+
+    // Обновляем объявления после успешной отправки
+    getAds();
+  };
+
+  const adData = {
+    title: adTitle.value,
+    description: adDescription.value,
+    price: parseFloat(adPrice.value),
+    address: adAddress.value,
+    latitude: adLatitude.value,
+    longitude: adLongitude.value,
+    area: adArea.value,
+    rooms: parseInt(adRooms.value),
+    floor: parseInt(adFloor.value),
+    elevator: parseInt(adElevator.value),
+    balcony: parseInt(adBalcony.value),
+    furniture: parseInt(adFurniture.value),
+    appliances: parseInt(adAppliances.value),
+    type: adType.value,
+    internet: parseInt(adInternet.value),
+    img: adImg.value,
+  };
+
+  xhr.send(JSON.stringify(adData));
+});
+
+function toggleNav() {
+  const navigationPanel = document.querySelector('.navigation-panel');
+  navigationPanel.classList.toggle('open');
+}
+
     </script>
   </body>
 </html>

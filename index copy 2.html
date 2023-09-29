@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="ru">
+    <title>Редактор новостей</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f2f2f2;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        max-width: 500px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      form label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+      }
+
+      form input,
+      form textarea {
+        margin-bottom: 10px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      form button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      form button:hover {
+        background-color: #45a049;
+      }
+
+      .message {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f2f2f2;
+        border-radius: 4px;
+        color: #333;
+      }
+
+      .error {
+        color: red;
+      }
+
+      .news-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+
+      .news-card {
+        width: calc(33.33% - 20px);
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .news-card h2 {
+        margin-top: 0;
+        color: #333;
+      }
+
+      .news-card p {
+        margin: 10px 0;
+        color: #666;
+      }
+
+      .news-card img {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 4px;
+      }
+
+      .edit-form {
+        display: none;
+      }
+
+      .edit-form input,
+      .edit-form textarea {
+        margin-bottom: 10px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .edit-form button {
+        padding: 5px 10px;
+        font-size: 14px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .edit-form button:hover {
+        background-color: #45a049;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 10px;
+        }
+
+        form {
+          max-width: 100%;
+        }
+
+        .news-card {
+          width: 100%;
+        }
+      }
+      .delete-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+  background-color: #ff7875;
+}
+
+.edit-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.edit-button:hover {
+  background-color: #40a9ff;
+}
+/* Добавляем стили для панели навигации */
+.navigation-panel {
+  background-color: #333;
+  color: white;
+  width: 250px;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+}
+
+.navigation-panel ul {
+  list-style: none;
+  padding: 0;
+}
+
+.navigation-panel ul li {
+  padding: 10px;
+}
+
+.navigation-panel ul li a {
+  text-decoration: none;
+  color: white;
+}
+
+.navigation-panel ul li a:hover {
+  text-decoration: underline;
+}
+
+.menu-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        cursor: pointer;
+        z-index: 2;
+        color: white;
+      }
+
+      /* Скрытая панель навигации */
+      .navigation-panel {
+        background-color: #333;
+        color: white;
+        width: 0;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        overflow-y: auto;
+        transition: width 0.3s ease;
+      }
+
+      .navigation-panel.open {
+        width: 250px;
+      }
+      .news-card img {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Добавляем кнопку меню -->
+    <div class="menu-button" onclick="toggleNav()">Меню</div>
+
+    <div class="navigation-panel">
+      <ul>
+        <li><a href="#">Главная</a></li>
+        <li><a href="#">Новости</a></li>
+        <li><a href="#">О нас</a></li>
+        <li><a href="#">Контакты</a></li>
+      </ul>
+    </div>
+
+    <!-- Добавляем кнопку меню -->
+    <div class="menu-button" onclick="toggleNav()">Меню</div>  
+    <h1>Редактор новостей</h1>
+<!-- Форма для добавления и редактирования объявлений -->
+<form id="dataaForm">
+  <input type="hidden" id="dataaId" name="id">
+
+  <label for="category">Категория:</label>
+  <input type="text" id="category" name="category" required>
+
+  <label for="name">Название:</label>
+  <input type="text" id="name" name="name" required>
+
+  <label for="address">Адрес:</label>
+  <input type="text" id="address" name="address" required>
+
+  <label for="discount">Скидка:</label>
+  <input type="text" id="discount" name="discount" required>
+
+  <label for="info">Информация:</label>
+  <textarea id="info" name="info" rows="5" required></textarea>
+
+  <label for="image">Ссылка на изображение:</label>
+  <input type="text" id="image" name="image" required>
+
+  <button type="submit">Добавить/Сохранить данные</button>
+</form>
+
+<div id="messageContainer"></div>
+
+<h2>Существующие данные</h2>
+<div id="dataaContainer" class="dataa-container">
+  <img src="" alt="Изображение данных" id="dataaImage">
+</div>
+
+<div id="editFormContainer" class="edit-form">
+  <h2>Редактирование данных</h2>
+  <form id="editDataaForm">
+    <input type="hidden" id="editDataaId" name="id">
+
+    <label for="editCategory">Категория:</label>
+    <input type="text" id="editCategory" name="category" required>
+
+    <label for="editName">Название:</label>
+    <input type="text" id="editName" name="name" required>
+
+    <label for="editAddress">Адрес:</label>
+    <input type="text" id="editAddress" name="address" required>
+
+    <label for="editDiscount">Скидка:</label>
+    <input type="text" id="editDiscount" name="discount" required>
+
+    <label for="editInfo">Информация:</label>
+    <textarea id="editInfo" name="info" rows="5" required></textarea>
+
+    <label for="editImage">Ссылка на изображение:</label>
+    <input type="text" id="editImage" name="image" required>
+
+    <button type="submit">Сохранить изменения</button>
+    <button type="button" id="cancelEditDataa">Отмена</button>
+  </form>
+</div>
+    <script>
+const editDataaForm = document.getElementById('editDataaForm');
+const dataaForm = document.getElementById('dataaForm');
+const editDataaId = document.getElementById('editDataaId');
+const editCategory = document.getElementById('editCategory');
+const editName = document.getElementById('editName');
+const editAddress = document.getElementById('editAddress');
+const editDiscount = document.getElementById('editDiscount');
+const editInfo = document.getElementById('editInfo');
+const editImage = document.getElementById('editImage');
+const cancelEditDataaButton = document.getElementById('cancelEditDataa');
+
+const category = document.getElementById('category');
+const name = document.getElementById('name');
+const address = document.getElementById('address');
+const discount = document.getElementById('discount');
+const info = document.getElementById('info');
+const image = document.getElementById('image');
+
+const dataaContainer = document.getElementById('dataaContainer');
+const messageContainer = document.getElementById('messageContainer');
+
+function getDataa() {
+  fetch('http://212.192.134.23/dataa')
+    .then((response) => response.json())
+    .then((data) => {
+      dataaContainer.innerHTML = '';
+
+      data.forEach((dataa) => {
+        const card = document.createElement('div');
+        card.classList.add('dataa-card');
+
+        const categoryElement = document.createElement('p');
+        categoryElement.textContent = `Категория: ${dataa.category}`;
+
+        const nameElement = document.createElement('p');
+        nameElement.textContent = `Название: ${dataa.name}`;
+
+        const addressElement = document.createElement('p');
+        addressElement.textContent = `Адрес: ${dataa.address}`;
+
+        const discountElement = document.createElement('p');
+        discountElement.textContent = `Скидка: ${dataa.discount}`;
+
+        const infoElement = document.createElement('p');
+        infoElement.textContent = `Информация: ${dataa.info}`;
+
+        const img = document.createElement('img');
+        img.src = dataa.image;
+        img.alt = 'Изображение данных';
+
+        card.appendChild(img);
+        card.appendChild(categoryElement);
+        card.appendChild(nameElement);
+        card.appendChild(addressElement);
+        card.appendChild(discountElement);
+        card.appendChild(infoElement);
+
+        const editButton = document.createElement('button');
+        editButton.textContent = 'Редактировать';
+        editButton.classList.add('edit-button');
+        editButton.addEventListener('click', () => {
+          loadDataaToEdit(dataa);
+          editFormContainer.style.display = 'block';
+        });
+
+        card.appendChild(editButton);
+
+        dataaContainer.appendChild(card);
+      });
+    })
+    .catch((error) => {
+      console.error('Ошибка при загрузке данных:', error);
+      const errorMessage = document.createElement('div');
+      errorMessage.textContent = 'Ошибка при загрузке данных';
+      errorMessage.classList.add('message', 'error');
+      messageContainer.appendChild(errorMessage);
+    });
+}
+
+function loadDataaToEdit(dataa) {
+  editDataaId.value = dataa.id;
+  editCategory.value = dataa.category;
+  editName.value = dataa.name;
+  editAddress.value = dataa.address;
+  editDiscount.value = dataa.discount;
+  editInfo.value = dataa.info;
+  editImage.value = dataa.image;
+}
+
+getDataa();
+
+editDataaForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  messageContainer.innerHTML = '';
+
+  const formData = new FormData(editDataaForm);
+  const dataaId = editDataaId.value;
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('PUT', `http://212.192.134.23/dataa/${dataaId}`);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onload = function () {
+    const response = JSON.parse(xhr.responseText);
+    const message = document.createElement('div');
+
+    if (xhr.status === 200) {
+      message.textContent = response.message;
+      message.classList.add('message');
+    } else {
+      message.textContent = response.error;
+      message.classList.add('message', 'error');
+    }
+
+    messageContainer.appendChild(message);
+    editDataaForm.reset();
+    editFormContainer.style.display = 'none';
+
+    getDataa();
+  };
+
+  const dataaData = {
+    category: editCategory.value,
+    name: editName.value,
+    address: editAddress.value,
+    discount: editDiscount.value,
+    info: editInfo.value,
+    image: editImage.value,
+  };
+
+  xhr.send(JSON.stringify(dataaData));
+});
+
+dataaForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  messageContainer.innerHTML = '';
+
+  const formData = new FormData(dataaForm);
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', 'http://212.192.134.23/dataa/');
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onload = function () {
+    const response = JSON.parse(xhr.responseText);
+    const message = document.createElement('div');
+
+    if (xhr.status === 200) {
+      message.textContent = response.message;
+      message.classList.add('message');
+    } else {
+      message.textContent = response.error;
+      message.classList.add('message', 'error');
+    }
+
+    messageContainer.appendChild(message);
+    dataaForm.reset();
+
+    getDataa();
+  };
+
+  const dataaData = {
+    category: category.value,
+    name: name.value,
+    address: address.value,
+    discount: discount.value,
+    info: info.value,
+    image: image.value,
+  };
+
+  xhr.send(JSON.stringify(dataaData));
+});
+
+// Initial load
+getDataa();
+
+cancelEditDataaButton.addEventListener('click', () => {
+  editDataaForm.reset();
+  editFormContainer.style.display = 'none';
+});
+    </script>
+  </body>
+</html>
