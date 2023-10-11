@@ -9,9 +9,20 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "API_URL": "http://212.192.134.23/api",
+        "SERVER_URL": "http://212.192.134.23"
+      },
+      "android": {
+        "buildType": "apk"
+      }
     },
     "production": {
+      "env": {
+        "API_URL": "http://212.192.134.23/api",
+        "SERVER_URL": "http://212.192.134.23"
+      },
       "android": {
         "buildType": "apk"
       }
