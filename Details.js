@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, View, Text, Image, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import MapView, { Marker } from 'react-native-maps';
+import { View, Text, Image, Linking, ScrollView, TouchableOpacity, Modal, Button } from 'react-native';
 import Swiper from 'react-native-swiper';
-import { Linking } from 'react-native';
-
+import MapView, { Marker } from 'react-native-maps';
 const styles = {
   container: {
     flex: 1,
@@ -89,17 +86,8 @@ const styles = {
     textAlign: 'center',
   },
 };
+const Details = ({ route, navigation }) => {
 
-const infrastructureIcons = [
-  'bus',
-  'cart',
-  'basket',
-  'school',
-  'restaurant',
-  'car',
-];
-
-const Details = ({ route }) => {
   const [ad, setAd] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -117,7 +105,7 @@ const Details = ({ route }) => {
     try {
       const response = await fetch(`http://212.192.134.23/ads/${id}`);
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error(`Server returned ${response.status} ${response.statusText}`);
       }
       const data = await response.json();
       setAd(data);
@@ -127,7 +115,7 @@ const Details = ({ route }) => {
       setLoading(false);
     }
   };
-
+  
   const getLandlordData = async () => {
     try {
       const response = await fetch(`http://212.192.134.23/landlord`);
@@ -142,9 +130,13 @@ const Details = ({ route }) => {
   };
 
   useEffect(() => {
-    getAd(id);
-    getLandlordData();
-  }, [id]);
+    const unsubscribe = navigation.addListener('focus', () => {
+      getAd(id);
+      getLandlordData();
+    });
+
+    return unsubscribe;
+  }, [navigation, id]);
 
   if (loading) {
     return <Text>Loading…</Text>;
@@ -158,13 +150,25 @@ const Details = ({ route }) => {
     <View style={styles.container}>
       <ScrollView>
         <View style={styles.ad}>
-          <Swiper style={styles.imageSlider} showsButtons={true}>
-            {ad.images.map((image, index) => (
-              <View key={index}>
-                <Image source={{ uri: image }} style={styles.image} />
+          {ad.image1 && ad.image2 ? (
+            <Swiper style={styles.imageSlider} showsButtons={true}>
+              <View>
+                <Image
+                  source={{ uri: ad.image1 }}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
               </View>
-            ))}
-          </Swiper>
+              <View>
+                <Image
+                  source={{ uri: ad.image2 }}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
+              </View>
+            </Swiper>
+          ) : null}
+
           <Text style={styles.title}>{ad.title}</Text>
           <Text style={styles.description}>{ad.description}</Text>
           <View style={styles.infoContainer}>
@@ -189,32 +193,31 @@ const Details = ({ route }) => {
         </View>
 
         <View style={styles.landlordContainer}>
-  <Image source={{ uri: landlord.photo }} style={styles.landlordPhoto} />
-  <View style={styles.landlordInfo}>
-    <Text style={styles.landlordName}>{landlord.name}</Text>
-    <Text style={styles.landlordContact}>{landlord.contact}</Text>
-  </View>
-  <View style={styles.contactButtonContainer}>
-    <TouchableOpacity
-      style={styles.contactButton}
-      onPress={() => {
-        if (landlord.telegramUsername) {
-          const telegramURL = `https://t.me/${landlord.telegramUsername}`;
-          Linking.openURL(telegramURL).catch((err) => {
-            console.error('Ошибка при открытии ссылки в Telegram: ' + err);
-          });
-        } else {
-          console.error('Имя пользователя Telegram не найдено');
-        }
-      }}
-    >
-      <Text style={styles.contactButtonText}>Связаться</Text>
-    </TouchableOpacity>
-  </View>
-</View>
+          <Image source={{ uri: landlord.photo }} style={styles.landlordPhoto} />
+          <View style={styles.landlordInfo}>
+            <Text style={styles.landlordName}>{landlord.name}</Text>
+            <Text style={styles.landlordContact}>{landlord.contact}</Text>
+          </View>
+          <View style={styles.contactButtonContainer}>
+            <TouchableOpacity
+              style={styles.contactButton}
+              onPress={() => {
+                if (landlord.telegramUsername) {
+                  const telegramURL = `https://t.me/${landlord.telegramUsername}`;
+                  Linking.openURL(telegramURL).catch((err) => {
+                    console.error('Ошибка при открытии ссылки в Telegram: ' + err);
+                  });
+                } else {
+                  console.error('Имя пользователя Telegram не найдено');
+                }
+              }}
+            >
+              <Text style={styles.contactButtonText}>Связаться</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
-
- <View
+        <View
           style={{
             borderWidth: 1,
             borderColor: '#E0E0E0',
@@ -228,22 +231,22 @@ const Details = ({ route }) => {
           <MapView
             style={{ width: 370, height: 300, borderRadius: 10 }}
             region={{
-              latitude: ad.latitude, // Используйте координаты из объявления
-              longitude: ad.longitude,
+              latitude: parseFloat(ad.latitude),
+              longitude: parseFloat(ad.longitude),
               latitudeDelta: 0.01,
               longitudeDelta: 0.01,
             }}
             initialRegion={{
-              latitude: ad.latitude, // Используйте координаты из объявления
-              longitude: ad.longitude,
+              latitude: parseFloat(ad.latitude),
+              longitude: parseFloat(ad.longitude),
               latitudeDelta: 0.01,
               longitudeDelta: 0.01,
             }}
           >
             <Marker
               coordinate={{
-                latitude: ad.latitude, // Используйте координаты из объявления
-                longitude: ad.longitude,
+                latitude: parseFloat(ad.latitude),
+                longitude: parseFloat(ad.longitude),
               }}
             />
           </MapView>
@@ -254,4 +257,3 @@ const Details = ({ route }) => {
 };
 
 export default Details;
-

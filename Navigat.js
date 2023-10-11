@@ -1,26 +1,21 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, View, Button } from 'react-native';
+import Map from './src/Components/Map/Map'
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-const App = () => {
+export default function App() {
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Здесь скоро появится Навигатор...</Text>
-    </View>
+    <GestureHandlerRootView style={styles.container}>
+      <Map></Map>
+    </GestureHandlerRootView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#007BFF',
-  },
 });
-
-export default App;

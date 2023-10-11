@@ -1,13 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
 
-  const [username, setUsername] = useState('s00000000@edu.kubsu.ru');
+  const [username, setUsername] = useState('s00000000@edu.kubsu.ru');  
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    // Попытка получить сохраненное имя пользователя при загрузке экрана
+    const loadUsername = async () => {
+      try {
+        const savedUsername = await AsyncStorage.getItem('username');
+        if (savedUsername !== null) {
+          setUsername(savedUsername);
+        }
+      } catch (error) {
+        console.error('Ошибка при загрузке имени пользователя из AsyncStorage:', error);
+      }
+    };
+
+    loadUsername();
+  }, []);
 
   const handleSubmit = async () => {
     setMessage('');
@@ -30,7 +47,11 @@ const LoginScreen = () => {
 
       if (response.ok) {
         setMessage(data.message);
-        navigation.navigate('Мероприятия'); 
+
+        // Сохранение имени пользователя в AsyncStorage после успешной аутентификации
+        await AsyncStorage.setItem('username', username);
+
+        navigation.navigate('Мероприятия');
       } else {
         throw new Error(data.error);
       }
@@ -38,7 +59,6 @@ const LoginScreen = () => {
       setMessage(error.message);
     }
 
-    setUsername('');
     setPassword('');
   };
 
@@ -83,7 +103,6 @@ const LoginScreen = () => {
     </ImageBackground>
   );
 };
-
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,

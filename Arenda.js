@@ -159,7 +159,7 @@ const Arenda = () => {
       <ScrollView >
         {filteredAds.map((ad) => (
           <View key={ad.id} style={styles.ad}>
-            <Image source={{ uri: ad.img }} style={styles.image} />
+            <Image source={{ uri: ad.image }} style={styles.image} />
             <Text style={styles.title}>{ad.title}</Text>
             <Text style={styles.description}>{ad.description}</Text>
             <Text style={styles.type}>{ad.type}</Text>
