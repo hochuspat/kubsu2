@@ -28,12 +28,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// Создайте подключение к вашей СУБД MySQL
+
 const connection = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: '12345',
-  database: 'mydatabase', // Имя базы данных, которую вы создали
+  database: 'mydatabase',
 });
 
 // Настройка папки с загруженными файлами
@@ -167,7 +167,7 @@ app.put('/ads/:id', (req, res) => {
     type,
     internet,
     img
-  } = req.body; // Параметры из запроса
+  } = req.body;
 
   // Выполняем SQL-запрос для обновления данных
   const sql =
@@ -223,7 +223,7 @@ app.post('/ads', (req, res) => {
     'internet',
     'img'
   ];
-console.log('POST запрос на сервер с данными:', req.body); // Добавьте эту строку
+console.log('POST запрос на сервер с данными:', req.body); 
   for (const field of requiredFields) {
     if (!(field in req.body)) {
       res.status(400).json({ error: `Отсутствует обязательное поле: ${field}` });
@@ -249,7 +249,7 @@ console.log('POST запрос на сервер с данными:', req.body);
     type,
     internet,
     img
-  } = req.body; // Параметры из запроса
+  } = req.body; 
 
   // Выполняем SQL-запрос для вставки данных
   const sql =
@@ -481,20 +481,20 @@ const server = app.listen(port, '212.192.134.23', () => {
 
 // Функция для перезапуска сервера
 function restartServer(server) {
-  // Слушать событие ошибки на сервере
+  
   server.on('error', (err) => {
-    // Вывести сообщение об ошибке
+    
     console.error(`Произошла ошибка: ${err.message}`);
-    // Завершить процесс сервера с кодом 1
+   
     server.close(() => {
       process.exit(1);
     });
   });
-  // Слушать событие закрытия сервера
+  
   server.on('close', () => {
-    // Вывести сообщение о закрытии
+   
     console.log('Сервер закрыт');
-    // Перезапустить сервер через 5 секунд
+   
     setTimeout(() => {
       server.listen(port, '212.192.134.23', () => {
         console.log(`Сервер перезапущен на порту ${port}`);
@@ -503,5 +503,5 @@ function restartServer(server) {
   });
 }
 
-// Вызвать функцию для перезапуска сервера
+
 restartServer(server);
